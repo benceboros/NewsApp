@@ -67,9 +67,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Hilt for dependency injection
-    implementation("com.google.dagger:hilt-android:2.44")
+    implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    // Dependency for navigation in Compose
+    implementation("androidx.navigation:navigation-compose:2.7.6")
 }
 
 // Allow references to generated code
