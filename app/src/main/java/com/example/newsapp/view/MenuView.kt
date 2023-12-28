@@ -73,7 +73,7 @@ fun ScreenScaffoldWithMenu(
                         icon = Icons.Default.Home
                     ),
                     MenuItem(
-                        id = Routes.NEWS_DETAILS_SCREEN.id,
+                        id = Routes.INFO_SCREEN.id,
                         title = "Info",
                         contentDescription = "Go to information screen",
                         icon = Icons.Default.Info
@@ -81,7 +81,7 @@ fun ScreenScaffoldWithMenu(
                 ),
                 onItemClick = {
                     if (navController.currentBackStackEntry?.destination?.route == Routes.NEWS_LIST_SCREEN.id) {
-                        if (it.id == Routes.NEWS_DETAILS_SCREEN.id) {
+                        if (it.id == Routes.INFO_SCREEN.id) {
                             navController.navigate(it.id)
                         }
                     } else {
