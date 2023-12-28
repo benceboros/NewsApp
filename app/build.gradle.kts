@@ -76,6 +76,9 @@ dependencies {
 
     // Image loading with Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Material Design components
+    implementation("androidx.compose.material:material:1.5.4")
 }
 
 // Allow references to generated code
