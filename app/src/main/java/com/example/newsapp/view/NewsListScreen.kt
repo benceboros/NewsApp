@@ -29,7 +29,7 @@ import com.example.newsapp.Routes
 import com.example.newsapp.model.News
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.newsDatePublishedStyle
-import com.example.newsapp.ui.theme.newsTitleStyle
+import com.example.newsapp.ui.theme.newsTitleListStyle
 import com.example.newsapp.viewmodel.NewsListScreenViewModel
 
 @Composable
@@ -90,7 +90,7 @@ fun DisplayNewsItem(newsItem: News, navController: NavController) {
             ) {
                 Text(
                     text = newsItem.title ?: "Title could not be loaded",
-                    style = newsTitleStyle
+                    style = newsTitleListStyle
                 )
                 Text(
                     text = newsItem.publishDate ?: "Publish date could not be loaded",
