@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.view.NewsDetailsScreen
 import com.example.newsapp.view.NewsListScreen
+import com.example.newsapp.view.ScreenScaffoldWithMenu
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,10 +28,17 @@ class MainActivity : ComponentActivity() {
             NewsAppTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = Routes.NEWS_LIST_SCREEN.id) {
-                        composable(Routes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
-                        composable(Routes.NEWS_DETAILS_SCREEN.id) { NewsDetailsScreen(navController) }
-                    }
+                    val scaffoldState = rememberScaffoldState()
+                    ScreenScaffoldWithMenu(
+                        navController = navController,
+                        scaffoldState = scaffoldState,
+                        scaffoldContent = {
+                            NavHost(navController = navController, startDestination = Routes.NEWS_LIST_SCREEN.id) {
+                                composable(Routes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
+                                composable(Routes.NEWS_DETAILS_SCREEN.id) { NewsDetailsScreen(navController) }
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -38,7 +47,8 @@ class MainActivity : ComponentActivity() {
 
 enum class Routes(val id: String) {
     NEWS_LIST_SCREEN("NewsListScreen"),
-    NEWS_DETAILS_SCREEN("NewsDetailsScreen")
+    NEWS_DETAILS_SCREEN("NewsDetailsScreen"),
+    INFO_SCREEN("InfoScreen")
 }
 
 @Preview(
