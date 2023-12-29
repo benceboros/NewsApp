@@ -36,9 +36,16 @@ val newsDateAndAuthorStyle = TextStyle(
 
 val contactInfoHeaderStyle = TextStyle(
     fontSize = 20.sp,
-    fontWeight = FontWeight.SemiBold
+    fontWeight = FontWeight.SemiBold,
+    color = Color.White
 )
 
 val contactInfoStyle = TextStyle (
     textDecoration = TextDecoration.Underline
+)
+
+val topAppBarTitleStyle = TextStyle (
+    fontSize = 18.sp,
+    fontWeight = FontWeight.SemiBold,
+    color = Color.White
 )

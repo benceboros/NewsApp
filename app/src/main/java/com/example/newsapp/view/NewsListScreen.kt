@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,7 +49,9 @@ fun DisplayNewsItemList(
     itemListState: LazyListState,
     navController: NavController
 ) {
-    LazyColumn(state = itemListState) {
+    LazyColumn(
+        state = itemListState
+    ) {
         items(newsList) { item ->
             DisplayNewsItem(newsItem = item, navController = navController)
         }
@@ -64,7 +67,10 @@ fun DisplayNewsItem(newsItem: News, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
-            .clickable { navController.navigate(Routes.NEWS_DETAILS_SCREEN.id) }
+            .clickable { navController.navigate(Routes.NEWS_DETAILS_SCREEN.id) },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Row(
             modifier = Modifier
