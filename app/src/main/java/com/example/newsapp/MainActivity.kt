@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.ui.theme.NewsAppTheme
+import com.example.newsapp.view.InfoScreenPreview
 import com.example.newsapp.view.NewsDetailsScreen
 import com.example.newsapp.view.NewsListScreen
 import com.example.newsapp.view.ScreenScaffoldWithMenu
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
                             NavHost(navController = navController, startDestination = Routes.NEWS_LIST_SCREEN.id) {
                                 composable(Routes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
                                 composable(Routes.NEWS_DETAILS_SCREEN.id) { NewsDetailsScreen(navController) }
+                                composable(Routes.INFO_SCREEN.id) { InfoScreenPreview() }
                             }
                         }
                     )
