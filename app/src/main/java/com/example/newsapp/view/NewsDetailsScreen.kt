@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +20,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.model.News
+import com.example.newsapp.navigateToUrl
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
 import com.example.newsapp.ui.theme.newsDescriptionStyle
@@ -35,6 +37,7 @@ fun NewsDetailsScreen(
 
 @Composable
 fun DisplayNewsItemDetails(newsItem: News, navController: NavController) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -79,7 +82,7 @@ fun DisplayNewsItemDetails(newsItem: News, navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = {
-                    navController.popBackStack()
+                    navController.navigateToUrl(newsItem.urlToArticle)
                 },
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(Color.Red)

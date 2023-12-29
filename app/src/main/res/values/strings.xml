@@ -14,7 +14,7 @@
     <string name="coil">Coil</string>
     <string name="url_coil">https://github.com/coil-kt/coil</string>
     <string name="material_design">Material Design</string>
-    <string name="url_material_design">https://m3.material.io/</string>
+    <string name="url_material_design">https://developer.android.com/jetpack/compose/components</string>
     <string name="coroutines">Coroutines</string>
     <string name="url_coroutines">https://kotlinlang.org/docs/coroutines-overview.html</string>
     <string name="phone">Phone</string>
@@ -26,4 +26,6 @@
     <string name="error_msg_unable_to_open_phone_dialer">Unable to open Phone app\'s dialer</string>
     <string name="error_msg_no_email_app_available">No email app is available</string>
     <string name="error_msg_unable_to_open_email_app">Unable to open phone\'s email app</string>
+    <string name="error_msg_failed_to_open_url">Failed to open URL</string>
+    <string name="error_msg_unable_to_open_url">Unable to open URL</string>
 </resources>
