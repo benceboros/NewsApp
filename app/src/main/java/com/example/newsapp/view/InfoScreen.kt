@@ -91,7 +91,7 @@ fun InfoHeader(
         modifier = modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(color = MaterialTheme.colorScheme.primaryContainer),
+            .background(color = MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
@@ -196,7 +196,7 @@ fun ContactInformation(
 @Composable
 fun ItemDivider() {
     Divider(
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = MaterialTheme.colorScheme.secondary,
         thickness = 1.dp,
         modifier = Modifier
             .padding(horizontal = 8.dp)
