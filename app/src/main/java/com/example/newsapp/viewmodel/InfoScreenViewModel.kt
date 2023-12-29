@@ -41,6 +41,14 @@ class InfoScreenViewModel @Inject constructor(
         TechnologyItem(
             name = context.getString(R.string.coroutines),
             websiteUrl = context.getString(R.string.url_coroutines)
+        ),
+        TechnologyItem(
+            name = context.getString(R.string.retrofit),
+            websiteUrl = context.getString(R.string.url_retrofit)
+        ),
+        TechnologyItem(
+            name = context.getString(R.string.moshi),
+            websiteUrl = context.getString(R.string.url_moshi)
         )
     )
 

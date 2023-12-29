@@ -34,4 +34,9 @@
     <string name="content_desc_go_to_information_screen">Go to information screen</string>
     <string name="content_desc_toggle_menu">Toggle Menu</string>
     <string name="content_desc_go_back_to_previous_screen">Go back to previous screen</string>
+    <string name="title_navigation_drawer_header">News App</string>
+    <string name="retrofit">Retrofit</string>
+    <string name="moshi">Moshi</string>
+    <string name="url_retrofit">https://square.github.io/retrofit/</string>
+    <string name="url_moshi">https://github.com/square/moshi/</string>
 </resources>

@@ -157,7 +157,7 @@ fun NavigationDrawerHeader() {
             .padding(horizontal = 16.dp, vertical = 32.dp),
     ) {
         Text(
-            text = "News App",
+            text = stringResource(R.string.title_navigation_drawer_header),
             fontSize = 32.sp
         )
     }
