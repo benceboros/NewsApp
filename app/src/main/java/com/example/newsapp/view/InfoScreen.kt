@@ -1,6 +1,9 @@
 package com.example.newsapp.view
 
+import android.content.Context
 import android.content.res.Configuration
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,10 +27,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.newsapp.model.ContactInformation
 import com.example.newsapp.model.TechnologyItem
@@ -54,7 +61,11 @@ fun InfoScreen(
         InfoHeader(headerTitle = "TECHNOLOGIES USED")
         TechnologyList(viewModel.technologies)
         InfoHeader(headerTitle = "CONTACT")
-        ContactInformation(viewModel.contactInformation)
+        ContactInformation(
+            contactInfoItems = viewModel.contactInformation,
+            openDialer = viewModel::openDialer,
+            openEmailApp = viewModel::openEmailApp
+        )
     }
 }
 
@@ -121,8 +132,11 @@ fun TechnologyList(
 
 @Composable
 fun ContactInformation(
-    contactInfoItems: List<ContactInformation>
+    contactInfoItems: List<ContactInformation>,
+    openDialer: (context: Context, phoneNumber: String) -> Unit,
+    openEmailApp: (context: Context, emailAddress: String) -> Unit
 ) {
+    val context = LocalContext.current
     Column {
         contactInfoItems.forEach { item ->
             Row(
@@ -133,7 +147,16 @@ fun ContactInformation(
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
-                    ) { println("$item clicked") },
+                    ) {
+                        when (item.name) {
+                            "Phone" -> {
+                                openDialer(context, item.value)
+                            }
+                            "E-mail" -> {
+                                openEmailApp(context, item.value)
+                            }
+                        }
+                      },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -143,6 +166,9 @@ fun ContactInformation(
                 )
                 Text(
                     text = item.value,
+                    style = TextStyle(
+                        textDecoration = TextDecoration.Underline
+                    ),
                     fontSize = if (item.name == "LinkedIn") 13.sp else 16.sp
                 )
             }
@@ -157,6 +183,18 @@ fun ContactInformation(
         }
     }
 }
+
+@Composable
+private fun WebviewScreen(url: String) = AndroidView(
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(8.dp),
+    factory = {
+        WebView(it).apply {
+            webViewClient = WebViewClient()
+            loadUrl(url)
+        }
+    })
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
