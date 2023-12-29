@@ -31,10 +31,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.R
 import com.example.newsapp.model.ContactInformation
 import com.example.newsapp.model.ContactInformationType
 import com.example.newsapp.model.TechnologyItem
+import com.example.newsapp.navigateToUrl
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.contactInfoHeaderStyle
 import com.example.newsapp.ui.theme.contactInfoStyle
@@ -42,6 +45,7 @@ import com.example.newsapp.viewmodel.InfoScreenViewModel
 
 @Composable
 fun InfoScreen(
+    navController: NavController,
     viewModel: InfoScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -63,10 +67,14 @@ fun InfoScreen(
         )
 
         InfoHeader(headerTitle = stringResource(R.string.header_technologies_used))
-        TechnologyList(viewModel.getTechnologies(context))
+        TechnologyList(
+            navController = navController,
+            technologyList =  viewModel.getTechnologies(context)
+        )
 
         InfoHeader(headerTitle = stringResource(R.string.header_contact))
         ContactInformation(
+            navController = navController,
             contactInfoItems = viewModel.getContactInformation(context),
             openDialer = viewModel::openDialer,
             openEmailApp = viewModel::openEmailApp
@@ -97,6 +105,7 @@ fun InfoHeader(
 
 @Composable
 fun TechnologyList(
+    navController: NavController,
     technologyList: List<TechnologyItem>
 ) {
     Column {
@@ -109,7 +118,9 @@ fun TechnologyList(
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
-                    ) { /*TODO Open URL*/ },
+                    ) {
+                      navController.navigateToUrl(item.websiteUrl)
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -131,6 +142,7 @@ fun TechnologyList(
 
 @Composable
 fun ContactInformation(
+    navController: NavController,
     contactInfoItems: List<ContactInformation>,
     openDialer: (context: Context, phoneNumber: String) -> Unit,
     openEmailApp: (context: Context, emailAddress: String) -> Unit
@@ -157,7 +169,7 @@ fun ContactInformation(
                             }
 
                             ContactInformationType.LINKEDIN -> {
-                                TODO()
+                                navController.navigateToUrl(item.value)
                             }
                         }
                     },
@@ -201,7 +213,8 @@ fun ItemDivider() {
 )
 @Composable
 fun InfoScreenPreview() {
+    val navController = rememberNavController()
     NewsAppTheme {
-        InfoScreen()
+        InfoScreen(navController)
     }
 }

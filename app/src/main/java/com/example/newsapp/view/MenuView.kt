@@ -15,6 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
@@ -22,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,6 +38,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.newsapp.R
 import com.example.newsapp.Routes
 import kotlinx.coroutines.launch
@@ -54,10 +57,14 @@ fun ScreenScaffoldWithMenu(
         drawerShape = menuOutlineShape(0.dp, 0.7f),
         topBar = {
             AppBar(
-                onNavigationIconClick = {
+                navController = navController,
+                onMenuIconClick = {
                     scope.launch {
                         scaffoldState.drawerState.open()
                     }
+                },
+                onBackIconClick = {
+                    navController.popBackStack()
                 }
             )
         },
@@ -68,14 +75,14 @@ fun ScreenScaffoldWithMenu(
                 items = listOf(
                     MenuItem(
                         id = Routes.NEWS_LIST_SCREEN.id,
-                        title = "News List",
-                        contentDescription = "Go to news list screen",
+                        title = stringResource(R.string.menu_item_news_list),
+                        contentDescription = stringResource(R.string.content_desc_go_to_news_list_screen),
                         icon = Icons.Default.Home
                     ),
                     MenuItem(
                         id = Routes.INFO_SCREEN.id,
-                        title = "Info",
-                        contentDescription = "Go to information screen",
+                        title = stringResource(R.string.menu_item_info),
+                        contentDescription = stringResource(R.string.content_desc_go_to_information_screen),
                         icon = Icons.Default.Info
                     )
                 ),
@@ -103,8 +110,11 @@ fun ScreenScaffoldWithMenu(
 
 @Composable
 fun AppBar(
-    onNavigationIconClick: () -> Unit
+    navController: NavController,
+    onMenuIconClick: () -> Unit,
+    onBackIconClick: () -> Unit
 ) {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
     TopAppBar(
         title = {
             Text(
@@ -114,11 +124,23 @@ fun AppBar(
         backgroundColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
         navigationIcon = {
-            IconButton(onClick = onNavigationIconClick) {
-                androidx.compose.material.Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Toggle Menu"
-                )
+            when (currentBackStackEntry?.destination?.route) {
+                Routes.NEWS_LIST_SCREEN.id, Routes.INFO_SCREEN.id -> {
+                    IconButton(onClick = onMenuIconClick) {
+                        androidx.compose.material.Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(R.string.content_desc_toggle_menu)
+                        )
+                    }
+                }
+                else -> {
+                    IconButton(onClick = onBackIconClick) {
+                        androidx.compose.material.Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.content_desc_go_back_to_previous_screen)
+                        )
+                    }
+                }
             }
         }
     )
