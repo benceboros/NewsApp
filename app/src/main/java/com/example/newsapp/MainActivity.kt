@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 ) {navBackStackEntry ->
                                     navBackStackEntry.arguments?.getString("url")?.let { url ->
-                                        WebViewScreen(navController = navController, url = url)
+                                        WebViewScreen(url = url)
                                     }
                                 }
                             }

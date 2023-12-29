@@ -28,4 +28,10 @@
     <string name="error_msg_unable_to_open_email_app">Unable to open phone\'s email app</string>
     <string name="error_msg_failed_to_open_url">Failed to open URL</string>
     <string name="error_msg_unable_to_open_url">Unable to open URL</string>
+    <string name="menu_item_news_list">News List</string>
+    <string name="content_desc_go_to_news_list_screen">Go to news list screen</string>
+    <string name="menu_item_info">Info</string>
+    <string name="content_desc_go_to_information_screen">Go to information screen</string>
+    <string name="content_desc_toggle_menu">Toggle Menu</string>
+    <string name="content_desc_go_back_to_previous_screen">Go back to previous screen</string>
 </resources>
