@@ -18,7 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.example.newsapp.model.News
+import com.example.newsapp.model.NewsItem
 import com.example.newsapp.navigateToUrl
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
@@ -35,7 +35,7 @@ fun NewsDetailsScreen(
 }
 
 @Composable
-fun DisplayNewsItemDetails(newsItem: News, navController: NavController) {
+fun DisplayNewsItemDetails(newsItem: NewsItem, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

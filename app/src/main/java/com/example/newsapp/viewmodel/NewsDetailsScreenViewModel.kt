@@ -1,7 +1,7 @@
 package com.example.newsapp.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.newsapp.model.News
+import com.example.newsapp.model.NewsItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -9,7 +9,7 @@ import javax.inject.Inject
 class NewsDetailsScreenViewModel @Inject constructor(
 
 ) : ViewModel() {
-    val selectedNewsItem = News(
+    val selectedNewsItem = NewsItem(
         imageUrl = "https://cdn.arstechnica.net/wp-content/uploads/2023/09/Screenshot-2023-09-12-at-12.11.31-PM-1-760x380.jpg",
         title = "Appeals court pauses ban on patent-infringing Apple Watch imports - Ars Technica",
         description = "Apple pulled the Watch Series 9 and Watch Ultra 2 from sale on December 21.",

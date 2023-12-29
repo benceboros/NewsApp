@@ -11,12 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.Routes
-import com.example.newsapp.model.News
+import com.example.newsapp.model.NewsItem
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.newsDatePublishedStyle
 import com.example.newsapp.ui.theme.newsTitleListStyle
@@ -36,30 +37,38 @@ import com.example.newsapp.viewmodel.NewsListScreenViewModel
 @Composable
 fun NewsListScreen(
     navController: NavController,
-    viewModel: NewsListScreenViewModel = hiltViewModel()
 ) {
     val itemListState: LazyListState = rememberLazyListState()
 
-    DisplayNewsItemList(newsList = viewModel.newsList, itemListState = itemListState, navController = navController)
+    DisplayNewsItemList(itemListState = itemListState, navController = navController)
 }
 
 @Composable
 fun DisplayNewsItemList(
-    newsList: List<News>,
+    viewModel: NewsListScreenViewModel = hiltViewModel(),
     itemListState: LazyListState,
     navController: NavController
 ) {
+    val newsList by remember { viewModel.newsList }
+    val paginationEndReached by remember { viewModel.paginationEndReached }
+    val loadError by remember { viewModel.loadError }
+    val isLoading by remember { viewModel.isLoading }
+
     LazyColumn(
         state = itemListState
     ) {
-        items(newsList) { item ->
-            DisplayNewsItem(newsItem = item, navController = navController)
+        val loadedNewsItemCount = newsList.size
+        items(loadedNewsItemCount) {
+            if (it >= loadedNewsItemCount -1 && !paginationEndReached) {
+                viewModel.loadNewsListPaginated()
+            }
+            DisplayNewsItem(newsItem = newsList[it], navController = navController)
         }
     }
 }
 
 @Composable
-fun DisplayNewsItem(newsItem: News, navController: NavController) {
+fun DisplayNewsItem(newsItem: NewsItem, navController: NavController) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp

@@ -1,21 +1,76 @@
 package com.example.newsapp.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.newsapp.model.News
+import androidx.lifecycle.viewModelScope
+import com.example.newsapp.data.remote.respones.Article
+import com.example.newsapp.model.NewsItem
+import com.example.newsapp.repository.NewsRepository
+import com.example.newsapp.util.Constants.API_KEY
+import com.example.newsapp.util.Constants.COUNTRY_CODE
+import com.example.newsapp.util.Constants.PAGE_SIZE
+import com.example.newsapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NewsListScreenViewModel @Inject constructor(
-
+    private val repository: NewsRepository
 ) : ViewModel() {
-    val newsItem = News(
-        imageUrl = "https://cdn.arstechnica.net/wp-content/uploads/2023/09/Screenshot-2023-09-12-at-12.11.31-PM-1-760x380.jpg",
-        title = "Appeals court pauses ban on patent-infringing Apple Watch imports - Ars Technica",
-        description = "Apple pulled the Watch Series 9 and Watch Ultra 2 from sale on December 21.",
-        publishDate = "2023-12-27T17:27:26Z",
-        author = "Jonathan M. Gitlin",
-        urlToArticle = "https://arstechnica.com/gadgets/2023/12/apple-appeals-trade-commission-ban-of-apple-watch-9-apple-watch-ultra-2/"
-    )
-    val newsList: List<News> = List(30) { newsItem }
+
+    private var currentPage = 1
+
+    var newsList = mutableStateOf<List<NewsItem>>(listOf())
+    var loadError = mutableStateOf("")
+    var isLoading = mutableStateOf(false)
+    var paginationEndReached = mutableStateOf(false)
+
+    init {
+        loadNewsListPaginated()
+    }
+
+    fun loadNewsListPaginated() {
+        viewModelScope.launch {
+            isLoading.value = true
+            val result = repository.getTopHeadlinesBasedOnCountry(
+                country = COUNTRY_CODE,
+                apiKey = API_KEY,
+                pageSize = PAGE_SIZE,
+                page = currentPage
+            )
+            when(result) {
+                is Resource.Success -> {
+                    paginationEndReached.value = currentPage * PAGE_SIZE >= result.data?.totalResults!!
+                    val newsItems: List<NewsItem>? = result.data.articles?.mapNotNull { article ->
+                        if (article.canBeDisplayed()) {
+                            NewsItem(
+                                imageUrl = article.urlToImage,
+                                title = article.title,
+                                description = article.description,
+                                publishDate = article.publishedAt,
+                                author = article.author,
+                                urlToArticle = article.url
+                            )
+                        } else null
+                    }
+
+                    currentPage++
+                    loadError.value = ""
+                    isLoading.value = false
+                    if (newsItems != null) {
+                        newsList.value += newsItems
+                    }
+                }
+
+                is Resource.Error -> {
+                    loadError.value = result.message!!
+                    isLoading.value = false
+                }
+            }
+        }
+    }
+
+    private fun Article.canBeDisplayed() : Boolean =
+        urlToImage != null && title != null && publishedAt != null
 }
