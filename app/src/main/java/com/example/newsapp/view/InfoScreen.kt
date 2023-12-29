@@ -2,8 +2,6 @@ package com.example.newsapp.view
 
 import android.content.Context
 import android.content.res.Configuration
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,41 +26,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.newsapp.R
 import com.example.newsapp.model.ContactInformation
+import com.example.newsapp.model.ContactInformationType
 import com.example.newsapp.model.TechnologyItem
 import com.example.newsapp.ui.theme.NewsAppTheme
+import com.example.newsapp.ui.theme.contactInfoHeaderStyle
+import com.example.newsapp.ui.theme.contactInfoStyle
 import com.example.newsapp.viewmodel.InfoScreenViewModel
 
 @Composable
 fun InfoScreen(
     viewModel: InfoScreenViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        InfoHeader(modifier = Modifier.padding(bottom = 16.dp), headerTitle = "INFORMATION")
+        InfoHeader(
+            modifier = Modifier.padding(bottom = 16.dp),
+            headerTitle = stringResource(R.string.header_information)
+        )
         Text(
-            text = "This is a News application created by Bence Boros. It uses News API, a free public REST API to obtain the articles.",
+            text = stringResource(R.string.app_info_desc),
             fontSize = 15.sp,
             modifier = Modifier
                 .padding(start = 8.dp, bottom = 16.dp)
         )
-        InfoHeader(headerTitle = "TECHNOLOGIES USED")
-        TechnologyList(viewModel.technologies)
-        InfoHeader(headerTitle = "CONTACT")
+
+        InfoHeader(headerTitle = stringResource(R.string.header_technologies_used))
+        TechnologyList(viewModel.getTechnologies(context))
+
+        InfoHeader(headerTitle = stringResource(R.string.header_contact))
         ContactInformation(
-            contactInfoItems = viewModel.contactInformation,
+            contactInfoItems = viewModel.getContactInformation(context),
             openDialer = viewModel::openDialer,
             openEmailApp = viewModel::openEmailApp
         )
@@ -85,8 +90,7 @@ fun InfoHeader(
             modifier = Modifier
                 .padding(start = 8.dp),
             text = headerTitle,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold
+            style = contactInfoHeaderStyle
         )
     }
 }
@@ -105,7 +109,7 @@ fun TechnologyList(
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
-                    ) { println("$item clicked") },
+                    ) { /*TODO Open URL*/ },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -115,16 +119,11 @@ fun TechnologyList(
                 )
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = "Go to URL icon"
+                    contentDescription = stringResource(R.string.content_desc_icon_go_to_url)
                 )
             }
             if (item != technologyList.last()) {
-                Divider(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    thickness = 1.dp,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                )
+                ItemDivider()
             }
         }
     }
@@ -148,53 +147,49 @@ fun ContactInformation(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
-                        when (item.name) {
-                            "Phone" -> {
+                        when (item.type) {
+                            ContactInformationType.PHONE -> {
                                 openDialer(context, item.value)
                             }
-                            "E-mail" -> {
+
+                            ContactInformationType.EMAIL -> {
                                 openEmailApp(context, item.value)
                             }
+
+                            ContactInformationType.LINKEDIN -> {
+                                TODO()
+                            }
                         }
-                      },
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${item.name}:",
+                    text = "${item.typeName}:",
                     fontSize = 18.sp
                 )
                 Text(
                     text = item.value,
-                    style = TextStyle(
-                        textDecoration = TextDecoration.Underline
-                    ),
-                    fontSize = if (item.name == "LinkedIn") 13.sp else 16.sp
+                    style = contactInfoStyle,
+                    fontSize = if (item.type == ContactInformationType.LINKEDIN) 13.sp else 16.sp
                 )
             }
             if (item != contactInfoItems.last()) {
-                Divider(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    thickness = 1.dp,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                )
+                ItemDivider()
             }
         }
     }
 }
 
 @Composable
-private fun WebviewScreen(url: String) = AndroidView(
-    modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp),
-    factory = {
-        WebView(it).apply {
-            webViewClient = WebViewClient()
-            loadUrl(url)
-        }
-    })
+fun ItemDivider() {
+    Divider(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        thickness = 1.dp,
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+    )
+}
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,

@@ -6,7 +6,9 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.example.newsapp.R
 import com.example.newsapp.model.ContactInformation
+import com.example.newsapp.model.ContactInformationType
 import com.example.newsapp.model.TechnologyItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -15,45 +17,48 @@ import javax.inject.Inject
 class InfoScreenViewModel @Inject constructor(
 
 ) : ViewModel() {
-    val technologies: List<TechnologyItem> = listOf(
+    fun getTechnologies(context: Context): List<TechnologyItem> = listOf(
         TechnologyItem(
-            name = "MVVM Architecture",
-            websiteUrl = "https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel"
+            name = context.getString(R.string.mvvm_architecture),
+            websiteUrl = context.getString(R.string.url_mvvm_architecture)
         ),
         TechnologyItem(
-            name = "Jetpack Compose",
-            websiteUrl = "https://developer.android.com/jetpack/compose"
+            name = context.getString(R.string.jetpack_compose),
+            websiteUrl = context.getString(R.string.url_jetpack_compose)
         ),
         TechnologyItem(
-            name = "Hilt - Dependency Injection",
-            websiteUrl = "https://developer.android.com/training/dependency-injection/hilt-android"
+            name = context.getString(R.string.hilt_dependency_injection),
+            websiteUrl = context.getString(R.string.url_hilt)
         ),
         TechnologyItem(
-            name = "Coil",
-            websiteUrl = "https://github.com/coil-kt/coil"
+            name = context.getString(R.string.coil),
+            websiteUrl = context.getString(R.string.url_coil)
         ),
         TechnologyItem(
-            name = "Material Design",
-            websiteUrl = "https://m3.material.io/"
+            name = context.getString(R.string.material_design),
+            websiteUrl = context.getString(R.string.url_material_design)
         ),
         TechnologyItem(
-            name = "Coroutines",
-            websiteUrl = "https://kotlinlang.org/docs/coroutines-overview.html"
+            name = context.getString(R.string.coroutines),
+            websiteUrl = context.getString(R.string.url_coroutines)
         )
     )
 
-    val contactInformation: List<ContactInformation> = listOf(
+    fun getContactInformation(context: Context): List<ContactInformation> = listOf(
         ContactInformation(
-            name = "Phone",
-            value = "+45 50 33 44 81"
+            type = ContactInformationType.PHONE,
+            typeName = context.getString(R.string.phone),
+            value = context.getString(R.string.phone_value)
         ),
         ContactInformation(
-            name = "E-mail",
-            value = "benceboros140@gmail.com"
+            type = ContactInformationType.EMAIL,
+            typeName = context.getString(R.string.e_mail),
+            value = context.getString(R.string.e_mail_value)
         ),
         ContactInformation(
-            name = "LinkedIn",
-            value = "https://www.linkedin.com/in/benceboros"
+            type = ContactInformationType.LINKEDIN,
+            typeName = context.getString(R.string.linkedin),
+            value = context.getString(R.string.linkedin_value)
         )
     )
 
@@ -63,7 +68,7 @@ class InfoScreenViewModel @Inject constructor(
         try {
             context.startActivity(dialIntent)
         } catch (s: SecurityException) {
-            Toast.makeText(context, "Unable to open Phone app's dialer", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_phone_dialer), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -74,9 +79,9 @@ class InfoScreenViewModel @Inject constructor(
             emailIntent.setData(emailUri)
             context.startActivity(emailIntent)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, "No email app is available", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_msg_no_email_app_available), Toast.LENGTH_LONG).show()
         } catch (t: Throwable) {
-            Toast.makeText(context, "Unable to open phone's email app", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_email_app), Toast.LENGTH_LONG).show()
         }
     }
 }

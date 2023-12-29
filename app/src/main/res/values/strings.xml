@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">NewsApp</string>
+    <string name="app_info_desc">This is a News application created by Bence Boros. It uses News API, a free public REST API to obtain the articles.</string>
+    <string name="header_information">INFORMATION</string>
+    <string name="header_technologies_used">TECHNOLOGIES USED</string>
+    <string name="header_contact">CONTACT</string>
+    <string name="content_desc_icon_go_to_url">Go to URL icon</string>
+    <string name="mvvm_architecture">MVVM Architecture</string>
+    <string name="url_mvvm_architecture">https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel</string>
+    <string name="jetpack_compose">Jetpack Compose</string>
+    <string name="url_jetpack_compose">https://developer.android.com/jetpack/compose</string>
+    <string name="hilt_dependency_injection">Hilt - Dependency Injection</string>
+    <string name="url_hilt">https://developer.android.com/training/dependency-injection/hilt-android</string>
+    <string name="coil">Coil</string>
+    <string name="url_coil">https://github.com/coil-kt/coil</string>
+    <string name="material_design">Material Design</string>
+    <string name="url_material_design">https://m3.material.io/</string>
+    <string name="coroutines">Coroutines</string>
+    <string name="url_coroutines">https://kotlinlang.org/docs/coroutines-overview.html</string>
+    <string name="phone">Phone</string>
+    <string name="phone_value">+45 50 33 44 81</string>
+    <string name="e_mail">E-mail</string>
+    <string name="e_mail_value">benceboros140@gmail.com</string>
+    <string name="linkedin">LinkedIn</string>
+    <string name="linkedin_value">https://www.linkedin.com/in/benceboros</string>
+    <string name="error_msg_unable_to_open_phone_dialer">Unable to open Phone app\'s dialer</string>
+    <string name="error_msg_no_email_app_available">No email app is available</string>
+    <string name="error_msg_unable_to_open_email_app">Unable to open phone\'s email app</string>
 </resources>
