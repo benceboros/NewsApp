@@ -6,7 +6,7 @@ import com.example.newsapp.model.NewsItem
 
 @Entity
 data class NewsEntity (
-    @PrimaryKey val id: Int? = null,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val imageUrl: String?,
     val title: String?,
     val description: String?,

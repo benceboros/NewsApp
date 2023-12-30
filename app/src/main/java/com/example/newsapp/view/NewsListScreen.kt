@@ -276,7 +276,9 @@ fun DisplayNewsEntity(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
-            .clickable { navController.navigate(Routes.NEWS_DETAILS_SCREEN.id) },
+            .clickable {
+                navController.navigate("${Routes.NEWS_DETAILS_SCREEN.id}/${newsEntity.id}")
+            },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )
@@ -294,6 +296,7 @@ fun DisplayNewsEntity(
                     .padding(4.dp),
                 model = newsEntity.imageUrl,
                 contentDescription = newsEntity.title,
+                error = painterResource(id = R.drawable.ic_broken_image)
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -313,20 +316,6 @@ fun DisplayNewsEntity(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun PageLoader() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier
-                .size(64.dp, 64.dp)
-        )
     }
 }
 

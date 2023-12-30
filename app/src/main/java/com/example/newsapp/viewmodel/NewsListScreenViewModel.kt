@@ -62,7 +62,7 @@ class NewsListScreenViewModel @Inject constructor(
                     }
                     if (newsEntitiesList != null) {
                         repository.insertNewsEntitiesToDb(newsEntitiesList)
-                        newsList.value += newsEntitiesList
+                        newsList.value = repository.getDbSavedNewsList()
                     }
                 }
 

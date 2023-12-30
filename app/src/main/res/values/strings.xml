@@ -51,4 +51,9 @@
     <string name="btn_ok">OK</string>
     <string name="room">Room</string>
     <string name="url_room">https://developer.android.com/training/data-storage/room</string>
+    <string name="content_desc_image_of_the_selected_news">Image of the selected news</string>
+    <string name="unknown_title">Unknown Title</string>
+    <string name="unknown_description">Unknown Description</string>
+    <string name="unknown_author">Unknown Author</string>
+    <string name="unknown_publish_date">Unknown publish date</string>
 </resources>

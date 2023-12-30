@@ -7,7 +7,7 @@ import com.example.newsapp.data.local.entities.NewsEntity
 
 @Database(
     entities = [NewsEntity::class],
-    version = 1
+    version = 2
 )
 
 abstract class NewsAppDatabase : RoomDatabase() {

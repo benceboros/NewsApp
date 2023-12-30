@@ -58,4 +58,8 @@ class NewsRepositoryImpl @Inject constructor(
     override suspend fun deleteDb() {
         newsDao.deleteNewsEntities()
     }
+
+    override suspend fun getSelectedNewsEntity(id: Int): NewsEntity {
+        return newsDao.getSelectedNewsEntity(id)
+    }
 }

@@ -44,8 +44,22 @@ class MainActivity : ComponentActivity() {
                         scaffoldContent = {
                             NavHost(navController = navController, startDestination = Routes.NEWS_LIST_SCREEN.id) {
                                 composable(Routes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
-                                composable(Routes.NEWS_DETAILS_SCREEN.id) { NewsDetailsScreen(navController) }
                                 composable(Routes.INFO_SCREEN.id) { InfoScreen(navController) }
+                                composable(
+                                    route = Routes.NEWS_DETAILS_SCREEN.id.plus("/{id}"),
+                                    arguments = listOf(
+                                        navArgument("id") {
+                                            type = NavType.IntType
+                                        }
+                                    )
+                                ) { navBackStackEntry ->
+                                    navBackStackEntry.arguments?.getInt("id")?.let { newsId ->
+                                        NewsDetailsScreen(
+                                            navController = navController,
+                                            newsId = newsId
+                                        )
+                                    }
+                                }
                                 composable(
                                     route = Routes.WEB_VIEW_SCREEN.id.plus("/{url}"),
                                     arguments = listOf(

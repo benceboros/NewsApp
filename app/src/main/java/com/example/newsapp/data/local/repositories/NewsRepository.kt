@@ -19,4 +19,6 @@ interface NewsRepository {
     suspend fun getDbSavedNewsList(): List<NewsEntity>
 
     suspend fun deleteDb()
+
+    suspend fun getSelectedNewsEntity(id: Int): NewsEntity
 }
