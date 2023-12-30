@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -45,11 +46,12 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.Routes
-import com.example.newsapp.model.NewsItem
+import com.example.newsapp.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.LightRed
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.NoInternetBannerBtnStyle
 import com.example.newsapp.ui.theme.NoInternetBannerDescStyle
+import com.example.newsapp.ui.theme.UseApplicationOfflineStyle
 import com.example.newsapp.ui.theme.newsDatePublishedStyle
 import com.example.newsapp.ui.theme.newsTitleListStyle
 import com.example.newsapp.viewmodel.NewsListScreenViewModel
@@ -61,16 +63,16 @@ fun NewsListScreen(
 ) {
     val newsList by remember { viewModel.newsList }
     val isLoadingInitialNews by remember { viewModel.isLoadingInitialNews }
+    val noOfflineNews = remember { viewModel.noOfflineNews }
 
     val loadedNewsItemCount = newsList.size
-
     val itemListState: LazyListState = rememberLazyListState()
 
     if (isLoadingInitialNews) {
         PageLoader()
     } else {
         if (loadedNewsItemCount > 0) {
-            DisplayNewsItemList(
+            DisplayNewsEntityList(
                 itemListState = itemListState,
                 navController = navController,
                 newsList = newsList,
@@ -81,17 +83,51 @@ fun NewsListScreen(
             )
         } else {
             DisplayNoInternetWithNoNews(
-                loadNewsListPaginated = viewModel::loadNewsListPaginated
+                loadNewsListPaginated = viewModel::loadNewsListPaginated,
+                loadDbSavedNews = viewModel::loadDbSavedNews
             )
+            if (noOfflineNews.value) {
+                NoOfflineNewsDialog(noOfflineNews = noOfflineNews)
+            }
         }
     }
 }
 
 @Composable
-fun DisplayNewsItemList(
+fun NoOfflineNewsDialog(
+    noOfflineNews: MutableState<Boolean>
+) {
+    AlertDialog(
+        containerColor = Color.White,
+        shape = RectangleShape,
+        onDismissRequest = {
+            noOfflineNews.value = false
+        },
+        title = {
+            Text(text = stringResource(R.string.title_could_not_load_offline_news))
+        },
+        text = {
+            Text(stringResource(R.string.desc_could_not_load_offline_news))
+        },
+        confirmButton = {
+            Button(
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                onClick = {
+                    noOfflineNews.value = false
+                }
+            ) {
+                Text(stringResource(R.string.btn_ok))
+            }
+        }
+    )
+}
+
+@Composable
+fun DisplayNewsEntityList(
     itemListState: LazyListState,
     navController: NavController,
-    newsList: List<NewsItem>,
+    newsList: List<NewsEntity>,
     loadErrorMessageState: MutableState<String>,
     paginationEndReachedState: MutableState<Boolean>,
     loadNewsListPaginated: () -> Unit,
@@ -116,7 +152,7 @@ fun DisplayNewsItemList(
                 if (it >= loadedNewsItemCount - 1 && !paginationEndReached) {
                     loadNewsListPaginated()
                 }
-                DisplayNewsItem(newsItem = newsList[it], navController = navController)
+                DisplayNewsEntity(newsEntity = newsList[it], navController = navController)
             }
         }
     }
@@ -148,7 +184,7 @@ fun NoInternetBanner(
                     .weight(5F)
             ) {
                 Text(
-                    text = stringResource(R.string.further_news_could_not_be_loaded),
+                    text = stringResource(R.string.news_could_not_be_updated),
                     style = NoInternetBannerDescStyle
                 )
             }
@@ -175,7 +211,8 @@ fun NoInternetBanner(
 
 @Composable
 fun DisplayNoInternetWithNoNews(
-    loadNewsListPaginated: () -> Unit
+    loadNewsListPaginated: () -> Unit,
+    loadDbSavedNews: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -200,6 +237,7 @@ fun DisplayNoInternetWithNoNews(
                 text = stringResource(R.string.news_could_not_be_loaded),
                 textAlign = TextAlign.Center
             )
+
             Button(
                 onClick = {
                     loadNewsListPaginated()
@@ -207,18 +245,30 @@ fun DisplayNoInternetWithNoNews(
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
-                    .padding(vertical = 16.dp)
+                    .padding(top = 16.dp, bottom = 8.dp)
             ) {
                 Text(
                     text = stringResource(R.string.btn_retry).uppercase(),
                 )
             }
+
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        loadDbSavedNews()
+                    },
+                text = stringResource(R.string.use_offline),
+                style = UseApplicationOfflineStyle
+            )
         }
     }
 }
 
 @Composable
-fun DisplayNewsItem(newsItem: NewsItem, navController: NavController) {
+fun DisplayNewsEntity(
+    newsEntity: NewsEntity,
+    navController: NavController
+) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -242,8 +292,8 @@ fun DisplayNewsItem(newsItem: NewsItem, navController: NavController) {
                     .weight(5F)
                     .fillMaxHeight()
                     .padding(4.dp),
-                model = newsItem.imageUrl,
-                contentDescription = newsItem.title,
+                model = newsEntity.imageUrl,
+                contentDescription = newsEntity.title,
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -254,11 +304,11 @@ fun DisplayNewsItem(newsItem: NewsItem, navController: NavController) {
                     .padding(4.dp)
             ) {
                 Text(
-                    text = newsItem.title ?: "Title could not be loaded",
+                    text = newsEntity.title ?: "Title could not be loaded",
                     style = newsTitleListStyle
                 )
                 Text(
-                    text = newsItem.publishDate ?: "Publish date could not be loaded",
+                    text = newsEntity.publishDate ?: "Publish date could not be loaded",
                     style = newsDatePublishedStyle
                 )
             }

@@ -1,7 +1,6 @@
 package com.example.newsapp.di
 
 import com.example.newsapp.data.remote.NewsApi
-import com.example.newsapp.repository.NewsRepository
 import com.example.newsapp.util.Constants.BASE_URL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -16,10 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    @Singleton
-    @Provides
-    fun provideNewsRepository(api: NewsApi) = NewsRepository(api)
-
     private val moshi =
         Moshi.Builder()
          .add(KotlinJsonAdapterFactory())

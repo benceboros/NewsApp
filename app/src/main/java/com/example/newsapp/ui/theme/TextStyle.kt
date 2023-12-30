@@ -60,3 +60,8 @@ val NoInternetBannerBtnStyle = TextStyle(
     color = DarkRed,
     fontWeight = FontWeight.SemiBold,
 )
+
+val UseApplicationOfflineStyle = TextStyle(
+    color = DarkRed,
+    textDecoration = TextDecoration.Underline
+)
