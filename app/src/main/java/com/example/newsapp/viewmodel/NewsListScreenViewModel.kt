@@ -8,9 +8,11 @@ import com.example.newsapp.model.NewsItem
 import com.example.newsapp.repository.NewsRepository
 import com.example.newsapp.util.Constants.API_KEY
 import com.example.newsapp.util.Constants.COUNTRY_CODE
+import com.example.newsapp.util.Constants.DEFAULT_LOADING_DURATION_IN_MILLIS
 import com.example.newsapp.util.Constants.PAGE_SIZE
 import com.example.newsapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,8 +24,8 @@ class NewsListScreenViewModel @Inject constructor(
     private var currentPage = 1
 
     var newsList = mutableStateOf<List<NewsItem>>(listOf())
-    var loadError = mutableStateOf("")
-    var isLoading = mutableStateOf(false)
+    var loadErrorMessage = mutableStateOf("")
+    var isLoadingInitialNews = mutableStateOf(false)
     var paginationEndReached = mutableStateOf(false)
 
     init {
@@ -32,7 +34,9 @@ class NewsListScreenViewModel @Inject constructor(
 
     fun loadNewsListPaginated() {
         viewModelScope.launch {
-            isLoading.value = true
+            if (newsList.value.isEmpty()) {
+                isLoadingInitialNews.value = true
+            }
             val result = repository.getTopHeadlinesBasedOnCountry(
                 country = COUNTRY_CODE,
                 apiKey = API_KEY,
@@ -56,16 +60,18 @@ class NewsListScreenViewModel @Inject constructor(
                     }
 
                     currentPage++
-                    loadError.value = ""
-                    isLoading.value = false
+                    loadErrorMessage.value = ""
+                    isLoadingInitialNews.value = false
                     if (newsItems != null) {
                         newsList.value += newsItems
                     }
                 }
 
                 is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                    // If the news cannot be loaded, give a little time to the user to see the loading bar before the error message is displayed
+                    delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
+                    loadErrorMessage.value = result.message ?: "An unexpected error happened"
+                    isLoadingInitialNews.value = false
                 }
             }
         }

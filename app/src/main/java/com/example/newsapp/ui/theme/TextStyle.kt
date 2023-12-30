@@ -40,12 +40,23 @@ val contactInfoHeaderStyle = TextStyle(
     color = Color.White
 )
 
-val contactInfoStyle = TextStyle (
+val contactInfoStyle = TextStyle(
     textDecoration = TextDecoration.Underline
 )
 
-val topAppBarTitleStyle = TextStyle (
+val topAppBarTitleStyle = TextStyle(
     fontSize = 18.sp,
     fontWeight = FontWeight.SemiBold,
     color = Color.White
+)
+
+val NoInternetBannerDescStyle = TextStyle(
+    fontSize = 13.sp,
+    fontWeight = FontWeight.SemiBold
+)
+
+val NoInternetBannerBtnStyle = TextStyle(
+    fontSize = 15.sp,
+    color = DarkRed,
+    fontWeight = FontWeight.SemiBold,
 )
