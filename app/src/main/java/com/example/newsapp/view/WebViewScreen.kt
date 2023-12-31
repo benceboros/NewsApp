@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.newsapp.R
+import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
 import com.example.newsapp.viewmodel.WebViewScreenEvent
 import com.example.newsapp.viewmodel.WebViewScreenViewModel
 
@@ -121,7 +121,7 @@ fun ErrorLoadingArticlePage() {
             )
             Text(
                 text = stringResource(R.string.webpage_could_not_be_loaded),
-                textAlign = TextAlign.Center
+                style = LoadErrorDescriptionStyle
             )
         }
     }

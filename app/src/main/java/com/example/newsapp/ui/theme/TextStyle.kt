@@ -65,3 +65,7 @@ val UseApplicationOfflineStyle = TextStyle(
     color = DarkRed,
     textDecoration = TextDecoration.Underline
 )
+
+val LoadErrorDescriptionStyle = TextStyle(
+    textAlign = TextAlign.Center
+)

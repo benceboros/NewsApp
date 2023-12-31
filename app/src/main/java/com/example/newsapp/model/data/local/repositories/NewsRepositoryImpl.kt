@@ -1,5 +1,6 @@
 package com.example.newsapp.model.data.local.repositories
 
+import android.util.Log
 import com.example.newsapp.model.data.local.daos.NewsDao
 import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.model.data.remote.NetworkManager
@@ -35,11 +36,10 @@ class NewsRepositoryImpl @Inject constructor(
         val response = try {
             networkManager.getTopHeadlinesBasedOnCountry(page = page)
         } catch (e: Exception) {
-            println("API ERROR: $e")
+            Log.e("API Error", "Reason: $e")
             return Resource.Error("Failed to get the top headlines based on the given country.")
         }
         val newsEntitiesList = convertArticlesToNewsEntities(response.articles)
-        println("NewsDB: ${newsDao.getNews().size}")
         return Resource.Success(newsEntitiesList to response.totalResults)
     }
 

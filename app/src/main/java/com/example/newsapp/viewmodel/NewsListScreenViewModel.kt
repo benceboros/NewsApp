@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.model.data.local.entities.NewsEntity
-import com.example.newsapp.model.data.local.repositories.NewsRepositoryImpl
+import com.example.newsapp.model.data.local.repositories.NewsRepository
 import com.example.newsapp.util.Constants.DEFAULT_LOADING_DURATION_IN_MILLIS
 import com.example.newsapp.util.Constants.PAGE_SIZE
 import com.example.newsapp.util.Resource
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NewsListScreenViewModel @Inject constructor(
-    private val repository: NewsRepositoryImpl
+    private val newsRepository: NewsRepository
 ) : ViewModel() {
 
     private var currentPage = 1
@@ -41,7 +41,7 @@ class NewsListScreenViewModel @Inject constructor(
 
     fun loadDbSavedNews() {
         viewModelScope.launch {
-            val dbSavedNews = repository.getDbSavedNewsList()
+            val dbSavedNews = newsRepository.getDbSavedNewsList()
             noOfflineNews.value = dbSavedNews.isEmpty()
             newsList.value = dbSavedNews
         }
@@ -56,7 +56,7 @@ class NewsListScreenViewModel @Inject constructor(
                 delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
             }
 
-            val newsResponseWithTotalResults = repository.getNewsResponseWithTotalResults(page = currentPage)
+            val newsResponseWithTotalResults = newsRepository.getNewsResponseWithTotalResults(page = currentPage)
             val newsEntitiesList = newsResponseWithTotalResults.data?.first
             val totalResults = newsResponseWithTotalResults.data?.second
 
@@ -69,14 +69,14 @@ class NewsListScreenViewModel @Inject constructor(
                     // the database is updated, so the old data are deleted
                     if (isLoadingInitialNews.value || refreshing.value) {
                         if (newsEntitiesList != null) {
-                            repository.deleteDb()
+                            newsRepository.deleteDb()
                         }
                         isLoadingInitialNews.value = false
                         refreshing.value = false
                     }
                     if (newsEntitiesList != null) {
-                        repository.insertNewsEntitiesToDb(newsEntitiesList)
-                        newsList.value = repository.getDbSavedNewsList()
+                        newsRepository.insertNewsEntitiesToDb(newsEntitiesList)
+                        newsList.value = newsRepository.getDbSavedNewsList()
                     }
                 }
 
@@ -85,11 +85,15 @@ class NewsListScreenViewModel @Inject constructor(
                     // before the error message is displayed
                     delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
                     loadError.value = true
-                    Log.e("Failed to load News Articles.", "Reason: ${ newsResponseWithTotalResults.message }")
+                    Log.e("Failed to load News Articles.", "Reason: ${newsResponseWithTotalResults.message}")
                     isLoadingInitialNews.value = false
                     refreshing.value = false
                 }
             }
         }
+    }
+
+    fun closeNoOfflineNewsDialog() {
+        noOfflineNews.value = false
     }
 }

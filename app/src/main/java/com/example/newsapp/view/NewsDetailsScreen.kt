@@ -1,14 +1,21 @@
 package com.example.newsapp.view
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -20,10 +27,10 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.model.data.local.entities.NewsEntity
-import com.example.newsapp.navigateToUrl
 import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
 import com.example.newsapp.ui.theme.newsDescriptionStyle
 import com.example.newsapp.ui.theme.newsTitleDetailStyle
+import com.example.newsapp.util.navigateToUrl
 import com.example.newsapp.viewmodel.NewsDetailsScreenEvent
 import com.example.newsapp.viewmodel.NewsDetailsScreenViewModel
 
@@ -46,29 +53,45 @@ fun NewsDetailsScreen(
 
 @Composable
 fun DisplayNewsItemDetails(newsEntity: NewsEntity?, navController: NavController) {
+    var imageIsLoading by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        AsyncImage(
+        Box(
             modifier = Modifier
                 .fillMaxWidth(),
-            model = newsEntity?.imageUrl,
-            contentDescription = stringResource(R.string.content_desc_image_of_the_selected_news),
-            error = painterResource(
-                id = R.drawable.ic_broken_image
+            contentAlignment = Alignment.Center
+        ) {
+            if (imageIsLoading) {
+                CircularProgressIndicator()
+            }
+            AsyncImage(
+                modifier = if (imageIsLoading) {
+                    Modifier
+                        .height(200.dp)
+                } else {
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                },
+                model = newsEntity?.imageUrl,
+                contentDescription = stringResource(R.string.content_desc_image_of_news_article),
+                onLoading = { imageIsLoading = true },
+                onSuccess = { imageIsLoading = false },
+                onError = { imageIsLoading = false },
+                error = painterResource(id = R.drawable.ic_broken_image)
             )
-        )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(horizontal = 12.dp)
         ) {
             Text(
                 text = newsEntity?.title ?: stringResource(R.string.unknown_title),
-                style = newsTitleDetailStyle,
-                modifier = Modifier
-                    .padding(top = 16.dp)
+                style = newsTitleDetailStyle
             )
             Text(
                 text = newsEntity?.description ?: stringResource(R.string.unknown_description),
