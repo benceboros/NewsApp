@@ -1,14 +1,12 @@
-package com.example.newsapp.data.local.repositories
+package com.example.newsapp.model.data.local.repositories
 
-import com.example.newsapp.data.local.daos.NewsDao
-import com.example.newsapp.data.local.entities.NewsEntity
-import com.example.newsapp.data.remote.NetworkManager
-import com.example.newsapp.data.remote.respones.Article
-import com.example.newsapp.model.NewsItem
+import com.example.newsapp.model.data.local.daos.NewsDao
+import com.example.newsapp.model.data.local.entities.NewsEntity
+import com.example.newsapp.model.data.remote.NetworkManager
+import com.example.newsapp.model.data.remote.respones.Article
 import com.example.newsapp.util.Resource
 import com.example.newsapp.util.canBeSaved
 import com.example.newsapp.util.formatToAppropriateDateFormat
-import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,9 +15,6 @@ class NewsRepositoryImpl @Inject constructor(
     private val networkManager: NetworkManager,
     private val newsDao: NewsDao
 ) : NewsRepository {
-
-    override val updateNewsList: SharedFlow<List<NewsItem>>
-        get() = TODO("Not yet implemented")
 
     override fun convertArticlesToNewsEntities(articles: List<Article>?): List<NewsEntity> {
         return articles?.mapNotNull { article ->

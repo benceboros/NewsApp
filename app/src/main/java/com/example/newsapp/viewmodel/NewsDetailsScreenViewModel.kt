@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newsapp.data.local.entities.NewsEntity
-import com.example.newsapp.data.local.repositories.NewsRepository
+import com.example.newsapp.model.data.local.entities.NewsEntity
+import com.example.newsapp.model.data.local.repositories.NewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

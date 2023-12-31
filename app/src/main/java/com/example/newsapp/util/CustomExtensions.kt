@@ -1,6 +1,6 @@
 package com.example.newsapp.util
 
-import com.example.newsapp.data.remote.respones.Article
+import com.example.newsapp.model.data.remote.respones.Article
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 

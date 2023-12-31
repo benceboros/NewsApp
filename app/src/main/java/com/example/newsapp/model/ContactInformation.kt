@@ -5,9 +5,3 @@ data class ContactInformation(
     val typeName: String,
     val value: String
 )
-
-enum class ContactInformationType {
-    PHONE,
-    EMAIL,
-    LINKEDIN
-}

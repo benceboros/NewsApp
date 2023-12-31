@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
-import com.example.newsapp.data.local.entities.NewsEntity
+import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.navigateToUrl
 import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
 import com.example.newsapp.ui.theme.newsDescriptionStyle

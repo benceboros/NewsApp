@@ -1,6 +1,6 @@
-package com.example.newsapp.data.remote
+package com.example.newsapp.model.data.remote
 
-import com.example.newsapp.data.remote.respones.NewsList
+import com.example.newsapp.model.data.remote.respones.NewsList
 import com.example.newsapp.util.Constants
 import javax.inject.Inject
 import javax.inject.Singleton

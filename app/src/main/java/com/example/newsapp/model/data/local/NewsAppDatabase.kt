@@ -1,9 +1,9 @@
-package com.example.newsapp.data.local
+package com.example.newsapp.model.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.newsapp.data.local.daos.NewsDao
-import com.example.newsapp.data.local.entities.NewsEntity
+import com.example.newsapp.model.data.local.daos.NewsDao
+import com.example.newsapp.model.data.local.entities.NewsEntity
 
 @Database(
     entities = [NewsEntity::class],

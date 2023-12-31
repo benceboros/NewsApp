@@ -120,7 +120,7 @@ fun ErrorLoadingArticlePage() {
                 contentDescription = stringResource(R.string.content_desc_ic_webpage_error)
             )
             Text(
-                text = stringResource(R.string.article_page_could_not_be_loaded),
+                text = stringResource(R.string.webpage_could_not_be_loaded),
                 textAlign = TextAlign.Center
             )
         }

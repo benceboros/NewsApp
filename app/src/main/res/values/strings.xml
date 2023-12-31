@@ -56,6 +56,6 @@
     <string name="unknown_description">Unknown Description</string>
     <string name="unknown_author">Unknown Author</string>
     <string name="unknown_publish_date">Unknown publish date</string>
-    <string name="article_page_could_not_be_loaded">The article page could not be loaded.</string>
+    <string name="webpage_could_not_be_loaded">The requested webpage could not be loaded.</string>
     <string name="content_desc_ic_webpage_error">Article page error icon</string>
 </resources>
