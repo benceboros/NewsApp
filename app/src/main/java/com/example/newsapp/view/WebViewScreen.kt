@@ -37,49 +37,64 @@ fun WebViewScreen(
         PageLoader()
     }
     if (!viewModel.state.loadError) {
-        AndroidView(
-            modifier = Modifier
-                .fillMaxSize(),
-            factory = {
-                WebView(it).apply {
-                    settings.apply {
-                        javaScriptEnabled = true
-                        domStorageEnabled = true
-                        loadsImagesAutomatically = true
-                        allowFileAccess = true
-                        allowContentAccess = true
-                    }
-                    webViewClient = object : WebViewClient() {
-                        override fun onReceivedError(
-                            view: WebView?,
-                            request: WebResourceRequest?,
-                            error: WebResourceError?
-                        ) {
-                            super.onReceivedError(view, request, error)
-                            if ((error?.description == "net::ERR_NAME_NOT_RESOLVED")) {
-                                viewModel.onEvent(WebViewScreenEvent.OnLoadingError)
-                            }
-                        }
-
-                        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                            super.onPageStarted(view, url, favicon)
-                            viewModel.onEvent(WebViewScreenEvent.OnLoadingInProgress(isLoading = true))
-                        }
-
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-                            viewModel.onEvent(WebViewScreenEvent.OnLoadingInProgress(isLoading = false))
-                        }
-                    }
-                    loadUrl(urlToArticle)
-                }
-            }
-        ) {
-            it.visibility = if (viewModel.state.isLoading || viewModel.state.loadError) View.GONE else View.VISIBLE
-        }
+        WebViewPage(
+            urlToArticle = urlToArticle,
+            isLoading = viewModel.state.isLoading,
+            loadError = viewModel.state.loadError,
+            onWebViewScreenEvent = viewModel::onEvent
+        )
     }
     if (viewModel.state.loadError) {
         ErrorLoadingArticlePage()
+    }
+}
+
+@Composable
+fun WebViewPage(
+    urlToArticle: String,
+    isLoading: Boolean,
+    loadError: Boolean,
+    onWebViewScreenEvent: (webViewScreenEvent: WebViewScreenEvent) -> Unit
+) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxSize(),
+        factory = {
+            WebView(it).apply {
+                settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    loadsImagesAutomatically = true
+                    allowFileAccess = true
+                    allowContentAccess = true
+                }
+                webViewClient = object : WebViewClient() {
+                    override fun onReceivedError(
+                        view: WebView?,
+                        request: WebResourceRequest?,
+                        error: WebResourceError?
+                    ) {
+                        super.onReceivedError(view, request, error)
+                        if ((error?.description == "net::ERR_NAME_NOT_RESOLVED")) {
+                            onWebViewScreenEvent(WebViewScreenEvent.OnLoadingError)
+                        }
+                    }
+
+                    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                        super.onPageStarted(view, url, favicon)
+                        onWebViewScreenEvent(WebViewScreenEvent.OnLoadingInProgress(isLoading = true))
+                    }
+
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        onWebViewScreenEvent(WebViewScreenEvent.OnLoadingInProgress(isLoading = false))
+                    }
+                }
+                loadUrl(urlToArticle)
+            }
+        }
+    ) {
+        it.visibility = if (isLoading || loadError) View.GONE else View.VISIBLE
     }
 }
 
@@ -110,11 +125,4 @@ fun ErrorLoadingArticlePage() {
             )
         }
     }
-}
-
-@Composable
-fun WebViewPage(
-    urlToArticle: String,
-    viewModel: WebViewScreenViewModel
-) {
 }
