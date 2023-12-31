@@ -1,6 +1,6 @@
 package com.example.newsapp.di
 
-import com.example.newsapp.data.remote.NewsApi
+import com.example.newsapp.model.data.remote.NewsApi
 import com.example.newsapp.util.Constants.BASE_URL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

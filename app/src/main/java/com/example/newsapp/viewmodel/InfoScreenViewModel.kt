@@ -74,16 +74,28 @@ class InfoScreenViewModel @Inject constructor(
         )
     )
 
+    /**
+     * Open the given phone number in the device's Phone app
+     *
+     * @param context Context for starting activity for ACTION_DIAL intent
+     * @param phoneNumber The phone number to be dialed in String format
+     */
     fun openDialer(context: Context, phoneNumber: String) {
         val phoneUri = Uri.parse("tel:$phoneNumber")
         val dialIntent = Intent(Intent.ACTION_DIAL, phoneUri)
         try {
             context.startActivity(dialIntent)
         } catch (s: SecurityException) {
-            Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_phone_dialer), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_phone_dialer), Toast.LENGTH_SHORT).show()
         }
     }
 
+    /**
+     * Gives the option to send an email to the given email address in an external email application
+     *
+     * @param context Context for starting activity for ACTION_SENDTO intent
+     * @param emailAddress The email address in String format
+     */
     fun openEmailApp(context: Context, emailAddress: String) {
         try {
             val emailUri = Uri.parse("mailto:$emailAddress")
@@ -91,9 +103,9 @@ class InfoScreenViewModel @Inject constructor(
             emailIntent.setData(emailUri)
             context.startActivity(emailIntent)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, context.getString(R.string.error_msg_no_email_app_available), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_msg_no_email_app_available), Toast.LENGTH_SHORT).show()
         } catch (t: Throwable) {
-            Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_email_app), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_email_app), Toast.LENGTH_SHORT).show()
         }
     }
 }

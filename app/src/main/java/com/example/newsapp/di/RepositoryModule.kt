@@ -1,7 +1,7 @@
 package com.example.newsapp.di
 
-import com.example.newsapp.data.local.repositories.NewsRepository
-import com.example.newsapp.data.local.repositories.NewsRepositoryImpl
+import com.example.newsapp.model.data.local.repositories.NewsRepository
+import com.example.newsapp.model.data.local.repositories.NewsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -24,21 +24,23 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,8 +49,9 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.Routes
-import com.example.newsapp.data.local.entities.NewsEntity
+import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.LightRed
+import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.NoInternetBannerBtnStyle
 import com.example.newsapp.ui.theme.NoInternetBannerDescStyle
@@ -64,34 +67,38 @@ fun NewsListScreen(
 ) {
     val newsList by remember { viewModel.newsList }
     val isLoadingInitialNews by remember { viewModel.isLoadingInitialNews }
-    val noOfflineNews = remember { viewModel.noOfflineNews }
+    val loadError by remember { viewModel.loadError }
+    val paginationEndReached by remember { viewModel.paginationEndReached }
+    val refreshing by remember { viewModel.refreshing }
+    val noOfflineNews by remember { viewModel.noOfflineNews }
 
-    val loadedNewsItemCount = newsList.size
     val itemListState: LazyListState = rememberLazyListState()
 
     if (isLoadingInitialNews) {
         PageLoader()
     } else {
-        if (loadedNewsItemCount > 0) {
+        if (newsList.isNotEmpty()) {
             DisplayNewsEntityList(
                 itemListState = itemListState,
                 navController = navController,
                 newsList = newsList,
-                loadErrorState = viewModel.loadError,
-                paginationEndReachedState = viewModel.paginationEndReached,
-                refreshingState = viewModel.refreshing,
+                loadError = loadError,
+                paginationEndReached = paginationEndReached,
+                refreshing = refreshing,
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 refreshNews = viewModel::refreshNews,
-                loadedNewsItemCount = loadedNewsItemCount
+                loadedNewsItemCount = newsList.size
             )
         }
-        if (viewModel.loadError.value) {
+        if (loadError && newsList.isEmpty()) {
             DisplayNoInternetWithNoNews(
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 loadDbSavedNews = viewModel::loadDbSavedNews
             )
-            if (noOfflineNews.value) {
-                NoOfflineNewsDialog(noOfflineNews = noOfflineNews)
+            if (noOfflineNews) {
+                NoOfflineNewsDialog(
+                    closeNoOfflineNewsDialog = viewModel::closeNoOfflineNewsDialog
+                )
             }
         }
     }
@@ -99,13 +106,13 @@ fun NewsListScreen(
 
 @Composable
 fun NoOfflineNewsDialog(
-    noOfflineNews: MutableState<Boolean>
+    closeNoOfflineNewsDialog: () -> Unit,
 ) {
     AlertDialog(
         containerColor = Color.White,
         shape = RectangleShape,
         onDismissRequest = {
-            noOfflineNews.value = false
+            closeNoOfflineNewsDialog()
         },
         title = {
             Text(text = stringResource(R.string.title_could_not_load_offline_news))
@@ -118,7 +125,7 @@ fun NoOfflineNewsDialog(
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 onClick = {
-                    noOfflineNews.value = false
+                    closeNoOfflineNewsDialog()
                 }
             ) {
                 Text(stringResource(R.string.btn_ok))
@@ -133,17 +140,14 @@ fun DisplayNewsEntityList(
     itemListState: LazyListState,
     navController: NavController,
     newsList: List<NewsEntity>,
-    loadErrorState: MutableState<Boolean>,
-    paginationEndReachedState: MutableState<Boolean>,
-    refreshingState: MutableState<Boolean>,
+    loadError: Boolean,
+    paginationEndReached: Boolean,
+    refreshing: Boolean,
     loadNewsListPaginated: () -> Unit,
     refreshNews: () -> Unit,
     loadedNewsItemCount: Int,
 ) {
-    val loadError by remember { loadErrorState }
-    val paginationEndReached by remember { paginationEndReachedState }
-
-    val pullRefreshState = rememberPullRefreshState(refreshing = refreshingState.value, onRefresh = { refreshNews() })
+    val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = { refreshNews() })
     Box(
         modifier = Modifier
             .pullRefresh(pullRefreshState)
@@ -167,7 +171,7 @@ fun DisplayNewsEntityList(
                 }
             }
         }
-        PullRefreshIndicator(refreshingState.value, pullRefreshState, Modifier.align(Alignment.TopCenter))
+        PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -248,7 +252,7 @@ fun DisplayNoInternetWithNoNews(
             )
             Text(
                 text = stringResource(R.string.news_could_not_be_loaded),
-                textAlign = TextAlign.Center
+                style = LoadErrorDescriptionStyle
             )
 
             Button(
@@ -282,6 +286,8 @@ fun DisplayNewsEntity(
     newsEntity: NewsEntity,
     navController: NavController
 ) {
+    var imageIsLoading by remember { mutableStateOf(false) }
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -302,15 +308,27 @@ fun DisplayNewsEntity(
                 .height(120.dp)
                 .padding(4.dp)
         ) {
-            AsyncImage(
+            Box(
                 modifier = Modifier
-                    .weight(5F)
                     .fillMaxHeight()
-                    .padding(4.dp),
-                model = newsEntity.imageUrl,
-                contentDescription = newsEntity.title,
-                error = painterResource(id = R.drawable.ic_broken_image)
-            )
+                    .weight(5F),
+                contentAlignment = Alignment.Center
+            ) {
+                if (imageIsLoading) {
+                    CircularProgressIndicator()
+                }
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(4.dp),
+                    model = newsEntity.imageUrl,
+                    contentDescription = stringResource(R.string.content_desc_image_of_news_article),
+                    onLoading = { imageIsLoading = true },
+                    onSuccess = { imageIsLoading = false },
+                    onError = { imageIsLoading = false },
+                    error = painterResource(id = R.drawable.ic_broken_image)
+                )
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -320,11 +338,13 @@ fun DisplayNewsEntity(
                     .padding(4.dp)
             ) {
                 Text(
-                    text = newsEntity.title ?: "Title could not be loaded",
-                    style = newsTitleListStyle
+                    text = newsEntity.title ?: stringResource(id = R.string.unknown_title),
+                    style = newsTitleListStyle,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = newsEntity.publishDate ?: "Publish date could not be loaded",
+                    text = newsEntity.publishDate ?: stringResource(id = R.string.unknown_publish_date),
                     style = newsDatePublishedStyle
                 )
             }

@@ -1,4 +1,4 @@
-package com.example.newsapp.data.remote.respones
+package com.example.newsapp.model.data.remote.respones
 
 import com.squareup.moshi.JsonClass
 

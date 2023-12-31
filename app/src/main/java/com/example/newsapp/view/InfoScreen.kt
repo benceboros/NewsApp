@@ -37,10 +37,10 @@ import com.example.newsapp.R
 import com.example.newsapp.model.ContactInformation
 import com.example.newsapp.model.ContactInformationType
 import com.example.newsapp.model.TechnologyItem
-import com.example.newsapp.navigateToUrl
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.contactInfoHeaderStyle
 import com.example.newsapp.ui.theme.contactInfoStyle
+import com.example.newsapp.util.navigateToUrl
 import com.example.newsapp.viewmodel.InfoScreenViewModel
 
 @Composable
@@ -63,7 +63,7 @@ fun InfoScreen(
             text = stringResource(R.string.app_info_desc),
             fontSize = 15.sp,
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 16.dp)
+                .padding(start = 8.dp, end = 8.dp, bottom = 16.dp)
         )
 
         InfoHeader(headerTitle = stringResource(R.string.header_technologies_used))

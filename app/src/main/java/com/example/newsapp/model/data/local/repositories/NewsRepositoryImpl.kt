@@ -1,13 +1,13 @@
-package com.example.newsapp.data.local.repositories
+package com.example.newsapp.model.data.local.repositories
 
-import com.example.newsapp.data.local.daos.NewsDao
-import com.example.newsapp.data.local.entities.NewsEntity
-import com.example.newsapp.data.remote.NetworkManager
-import com.example.newsapp.data.remote.respones.Article
-import com.example.newsapp.model.NewsItem
+import android.util.Log
+import com.example.newsapp.model.data.local.daos.NewsDao
+import com.example.newsapp.model.data.local.entities.NewsEntity
+import com.example.newsapp.model.data.remote.NetworkManager
+import com.example.newsapp.model.data.remote.respones.Article
 import com.example.newsapp.util.Resource
 import com.example.newsapp.util.canBeSaved
-import kotlinx.coroutines.flow.SharedFlow
+import com.example.newsapp.util.formatToAppropriateDateFormat
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,9 +17,6 @@ class NewsRepositoryImpl @Inject constructor(
     private val newsDao: NewsDao
 ) : NewsRepository {
 
-    override val updateNewsList: SharedFlow<List<NewsItem>>
-        get() = TODO("Not yet implemented")
-
     override fun convertArticlesToNewsEntities(articles: List<Article>?): List<NewsEntity> {
         return articles?.mapNotNull { article ->
             if (article.canBeSaved()) {
@@ -27,7 +24,7 @@ class NewsRepositoryImpl @Inject constructor(
                     imageUrl = article.urlToImage,
                     title = article.title,
                     description = article.description,
-                    publishDate = article.publishedAt,
+                    publishDate = article.publishedAt?.formatToAppropriateDateFormat(),
                     author = article.author,
                     urlToArticle = article.url
                 )
@@ -39,11 +36,10 @@ class NewsRepositoryImpl @Inject constructor(
         val response = try {
             networkManager.getTopHeadlinesBasedOnCountry(page = page)
         } catch (e: Exception) {
-            println("API ERROR: $e")
+            Log.e("API Error", "Reason: $e")
             return Resource.Error("Failed to get the top headlines based on the given country.")
         }
         val newsEntitiesList = convertArticlesToNewsEntities(response.articles)
-        println("NewsDB: ${newsDao.getNews().size}")
         return Resource.Success(newsEntitiesList to response.totalResults)
     }
 

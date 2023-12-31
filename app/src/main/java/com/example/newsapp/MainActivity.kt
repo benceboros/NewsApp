@@ -2,7 +2,6 @@ package com.example.newsapp
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,9 +23,6 @@ import com.example.newsapp.view.NewsListScreen
 import com.example.newsapp.view.ScreenScaffoldWithMenu
 import com.example.newsapp.view.WebViewScreen
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.Exception
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -69,7 +64,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 ) {navBackStackEntry ->
                                     navBackStackEntry.arguments?.getString("url")?.let { url ->
-                                        WebViewScreen(url = url)
+                                        WebViewScreen(urlToArticle = url)
                                     }
                                 }
                             }
@@ -86,19 +81,6 @@ enum class Routes(val id: String) {
     NEWS_DETAILS_SCREEN("NewsDetailsScreen"),
     INFO_SCREEN("InfoScreen"),
     WEB_VIEW_SCREEN("WebViewScreen"),
-}
-
-fun NavController.navigateToUrl(url: String?) {
-    if (url != null) {
-        try {
-            val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-            navigate("${Routes.WEB_VIEW_SCREEN.id}/$encodedUrl")
-        } catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.error_msg_failed_to_open_url), Toast.LENGTH_LONG).show()
-        }
-    } else {
-        Toast.makeText(context, context.getString(R.string.error_msg_unable_to_open_url), Toast.LENGTH_LONG).show()
-    }
 }
 
 @Preview(
