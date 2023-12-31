@@ -1,20 +1,42 @@
 package com.example.newsapp.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.newsapp.model.News
+import androidx.lifecycle.viewModelScope
+import com.example.newsapp.data.local.entities.NewsEntity
+import com.example.newsapp.data.local.repositories.NewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NewsDetailsScreenViewModel @Inject constructor(
-
+    private val newsRepository: NewsRepository
 ) : ViewModel() {
-    val selectedNewsItem = News(
-        imageUrl = "https://cdn.arstechnica.net/wp-content/uploads/2023/09/Screenshot-2023-09-12-at-12.11.31-PM-1-760x380.jpg",
-        title = "Appeals court pauses ban on patent-infringing Apple Watch imports - Ars Technica",
-        description = "Apple pulled the Watch Series 9 and Watch Ultra 2 from sale on December 21.",
-        publishDate = "2023-12-27T17:27:26Z",
-        author = "Jonathan M. Gitlin",
-        urlToArticle = "https://arstechnica.com/gadgets/2023/12/apple-appeals-trade-commission-ban-of-apple-watch-9-apple-watch-ultra-2/"
-    )
+    var state by mutableStateOf(NewsDetailsScreenState())
+        private set
+
+    fun onEvent(event: NewsDetailsScreenEvent) {
+        viewModelScope.launch {
+            when (event) {
+                is NewsDetailsScreenEvent.NewsItemSelected -> {
+                    if (event.id != null) {
+                        state = state.copy(
+                            selectedNewsEntity = newsRepository.getSelectedNewsEntity(event.id)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+data class NewsDetailsScreenState(
+    val selectedNewsEntity: NewsEntity? = null
+)
+
+sealed class NewsDetailsScreenEvent {
+    data class NewsItemSelected(val id: Int?) : NewsDetailsScreenEvent()
 }

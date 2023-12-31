@@ -1,21 +1,90 @@
 package com.example.newsapp.viewmodel
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.newsapp.model.News
+import androidx.lifecycle.viewModelScope
+import com.example.newsapp.data.local.entities.NewsEntity
+import com.example.newsapp.data.local.repositories.NewsRepositoryImpl
+import com.example.newsapp.util.Constants.DEFAULT_LOADING_DURATION_IN_MILLIS
+import com.example.newsapp.util.Constants.PAGE_SIZE
+import com.example.newsapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NewsListScreenViewModel @Inject constructor(
-
+    private val repository: NewsRepositoryImpl
 ) : ViewModel() {
-    val newsItem = News(
-        imageUrl = "https://cdn.arstechnica.net/wp-content/uploads/2023/09/Screenshot-2023-09-12-at-12.11.31-PM-1-760x380.jpg",
-        title = "Appeals court pauses ban on patent-infringing Apple Watch imports - Ars Technica",
-        description = "Apple pulled the Watch Series 9 and Watch Ultra 2 from sale on December 21.",
-        publishDate = "2023-12-27T17:27:26Z",
-        author = "Jonathan M. Gitlin",
-        urlToArticle = "https://arstechnica.com/gadgets/2023/12/apple-appeals-trade-commission-ban-of-apple-watch-9-apple-watch-ultra-2/"
-    )
-    val newsList: List<News> = List(30) { newsItem }
+
+    private var currentPage = 1
+
+    var newsList = mutableStateOf<List<NewsEntity>>(listOf())
+    var loadError = mutableStateOf(false)
+    var isLoadingInitialNews = mutableStateOf(false)
+    var paginationEndReached = mutableStateOf(false)
+    var noOfflineNews = mutableStateOf(false)
+    var refreshing = mutableStateOf(false)
+
+    init {
+        loadNewsListPaginated()
+    }
+
+    fun refreshNews() {
+        loadError.value = false
+        refreshing.value = true
+        currentPage = 1
+        loadNewsListPaginated()
+    }
+
+    fun loadDbSavedNews() {
+        viewModelScope.launch {
+            val dbSavedNews = repository.getDbSavedNewsList()
+            noOfflineNews.value = dbSavedNews.isEmpty()
+            newsList.value = dbSavedNews
+        }
+    }
+
+    fun loadNewsListPaginated() {
+        viewModelScope.launch {
+            if (newsList.value.isEmpty()) {
+                isLoadingInitialNews.value = true
+                delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
+            }
+            val newsResponseWithTotalResults = repository.getNewsResponseWithTotalResults(page = currentPage)
+            val newsEntitiesList = newsResponseWithTotalResults.data?.first
+            val totalResults = newsResponseWithTotalResults.data?.second
+
+            when (newsResponseWithTotalResults) {
+                is Resource.Success -> {
+                    paginationEndReached.value = currentPage * PAGE_SIZE >= (totalResults ?: PAGE_SIZE)
+                    currentPage++
+                    loadError.value = false
+                    if (isLoadingInitialNews.value || refreshing.value) {
+                        if (newsEntitiesList != null) {
+                            println("NewsDB: deleted")
+                            repository.deleteDb()
+                        }
+                        isLoadingInitialNews.value = false
+                        refreshing.value = false
+                    }
+                    if (newsEntitiesList != null) {
+                        repository.insertNewsEntitiesToDb(newsEntitiesList)
+                        newsList.value = repository.getDbSavedNewsList()
+                    }
+                }
+
+                is Resource.Error -> {
+                    // If the news cannot be loaded, give a little time to the user to see the loading bar before the error message is displayed
+                    delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
+                    loadError.value = true
+                    Log.e("Failed to load News Articles.", "Reason: ${ newsResponseWithTotalResults.message }")
+                    isLoadingInitialNews.value = false
+                    refreshing.value = false
+                }
+            }
+        }
+    }
 }
