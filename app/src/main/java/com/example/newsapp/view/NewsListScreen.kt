@@ -86,7 +86,7 @@ fun NewsListScreen(
                 loadedNewsItemCount = loadedNewsItemCount
             )
         }
-        if (viewModel.loadError.value) {
+        if (viewModel.loadError.value && loadedNewsItemCount < 1) {
             DisplayNoInternetWithNoNews(
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 loadDbSavedNews = viewModel::loadDbSavedNews

@@ -14,7 +14,7 @@
     <string name="coil">Coil</string>
     <string name="url_coil">https://github.com/coil-kt/coil</string>
     <string name="material_design">Material Design</string>
-    <string name="url_material_design">https://developer.android.com/jetpack/compose/components</string>
+    <string name="url_material_design">https://m3.material.io/</string>
     <string name="coroutines">Coroutines</string>
     <string name="url_coroutines">https://kotlinlang.org/docs/coroutines-overview.html</string>
     <string name="phone">Phone</string>
@@ -56,4 +56,6 @@
     <string name="unknown_description">Unknown Description</string>
     <string name="unknown_author">Unknown Author</string>
     <string name="unknown_publish_date">Unknown publish date</string>
+    <string name="article_page_could_not_be_loaded">The article page could not be loaded.</string>
+    <string name="content_desc_ic_webpage_error">Article page error icon</string>
 </resources>
