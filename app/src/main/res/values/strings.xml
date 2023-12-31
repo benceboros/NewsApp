@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">NewsApp</string>
-    <string name="app_info_desc">This is a News application created by Bence Boros. It uses News API, a free public REST API to obtain the articles.</string>
+    <string name="app_info_desc">This application is for browsing the latest news in the United States. It uses News API, a free public REST API to obtain the articles. It was created by Bence Boros.</string>
     <string name="header_information">INFORMATION</string>
     <string name="header_technologies_used">TECHNOLOGIES USED</string>
     <string name="header_contact">CONTACT</string>

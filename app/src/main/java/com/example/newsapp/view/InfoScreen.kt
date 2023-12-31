@@ -63,7 +63,7 @@ fun InfoScreen(
             text = stringResource(R.string.app_info_desc),
             fontSize = 15.sp,
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 16.dp)
+                .padding(start = 8.dp, end = 8.dp, bottom = 16.dp)
         )
 
         InfoHeader(headerTitle = stringResource(R.string.header_technologies_used))
