@@ -7,6 +7,7 @@ import com.example.newsapp.data.remote.respones.Article
 import com.example.newsapp.model.NewsItem
 import com.example.newsapp.util.Resource
 import com.example.newsapp.util.canBeSaved
+import com.example.newsapp.util.formatToAppropriateDateFormat
 import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,7 +28,7 @@ class NewsRepositoryImpl @Inject constructor(
                     imageUrl = article.urlToImage,
                     title = article.title,
                     description = article.description,
-                    publishDate = article.publishedAt,
+                    publishDate = article.publishedAt?.formatToAppropriateDateFormat(),
                     author = article.author,
                     urlToArticle = article.url
                 )

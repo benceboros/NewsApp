@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -321,7 +322,9 @@ fun DisplayNewsEntity(
             ) {
                 Text(
                     text = newsEntity.title ?: "Title could not be loaded",
-                    style = newsTitleListStyle
+                    style = newsTitleListStyle,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = newsEntity.publishDate ?: "Publish date could not be loaded",
