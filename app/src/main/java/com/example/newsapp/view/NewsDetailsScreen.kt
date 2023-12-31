@@ -26,7 +26,6 @@ import com.example.newsapp.ui.theme.newsDescriptionStyle
 import com.example.newsapp.ui.theme.newsTitleDetailStyle
 import com.example.newsapp.viewmodel.NewsDetailsScreenEvent
 import com.example.newsapp.viewmodel.NewsDetailsScreenViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun NewsDetailsScreen(
@@ -35,7 +34,6 @@ fun NewsDetailsScreen(
     viewModel: NewsDetailsScreenViewModel = hiltViewModel()
 ) {
     LaunchedEffect(key1 = true) {
-        delay(1000)
         viewModel.onEvent(NewsDetailsScreenEvent.NewsItemSelected(newsId))
     }
 

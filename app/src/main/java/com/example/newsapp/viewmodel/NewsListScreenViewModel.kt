@@ -1,5 +1,6 @@
 package com.example.newsapp.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,6 @@ import com.example.newsapp.util.Constants.DEFAULT_LOADING_DURATION_IN_MILLIS
 import com.example.newsapp.util.Constants.PAGE_SIZE
 import com.example.newsapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,12 +22,20 @@ class NewsListScreenViewModel @Inject constructor(
     private var currentPage = 1
 
     var newsList = mutableStateOf<List<NewsEntity>>(listOf())
-    var loadErrorMessage = mutableStateOf("")
+    var loadError = mutableStateOf(false)
     var isLoadingInitialNews = mutableStateOf(false)
     var paginationEndReached = mutableStateOf(false)
     var noOfflineNews = mutableStateOf(false)
+    var refreshing = mutableStateOf(false)
 
     init {
+        loadNewsListPaginated()
+    }
+
+    fun refreshNews() {
+        loadError.value = false
+        refreshing.value = true
+        currentPage = 1
         loadNewsListPaginated()
     }
 
@@ -43,6 +51,7 @@ class NewsListScreenViewModel @Inject constructor(
         viewModelScope.launch {
             if (newsList.value.isEmpty()) {
                 isLoadingInitialNews.value = true
+                delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
             }
             val newsResponseWithTotalResults = repository.getNewsResponseWithTotalResults(page = currentPage)
             val newsEntitiesList = newsResponseWithTotalResults.data?.first
@@ -52,13 +61,14 @@ class NewsListScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     paginationEndReached.value = currentPage * PAGE_SIZE >= (totalResults ?: PAGE_SIZE)
                     currentPage++
-                    loadErrorMessage.value = ""
-                    if (isLoadingInitialNews.value) {
+                    loadError.value = false
+                    if (isLoadingInitialNews.value || refreshing.value) {
                         if (newsEntitiesList != null) {
                             println("NewsDB: deleted")
                             repository.deleteDb()
                         }
                         isLoadingInitialNews.value = false
+                        refreshing.value = false
                     }
                     if (newsEntitiesList != null) {
                         repository.insertNewsEntitiesToDb(newsEntitiesList)
@@ -69,8 +79,10 @@ class NewsListScreenViewModel @Inject constructor(
                 is Resource.Error -> {
                     // If the news cannot be loaded, give a little time to the user to see the loading bar before the error message is displayed
                     delay(DEFAULT_LOADING_DURATION_IN_MILLIS)
-                    loadErrorMessage.value = newsResponseWithTotalResults.message ?: "An unexpected error happened"
+                    loadError.value = true
+                    Log.e("Failed to load News Articles.", "Reason: ${ newsResponseWithTotalResults.message }")
                     isLoadingInitialNews.value = false
+                    refreshing.value = false
                 }
             }
         }

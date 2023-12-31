@@ -13,15 +13,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,12 +77,15 @@ fun NewsListScreen(
                 itemListState = itemListState,
                 navController = navController,
                 newsList = newsList,
-                loadErrorMessageState = viewModel.loadErrorMessage,
+                loadErrorState = viewModel.loadError,
                 paginationEndReachedState = viewModel.paginationEndReached,
+                refreshingState = viewModel.refreshing,
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
+                refreshNews = viewModel::refreshNews,
                 loadedNewsItemCount = loadedNewsItemCount
             )
-        } else {
+        }
+        if (viewModel.loadError.value) {
             DisplayNoInternetWithNoNews(
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 loadDbSavedNews = viewModel::loadDbSavedNews
@@ -123,44 +127,53 @@ fun NoOfflineNewsDialog(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DisplayNewsEntityList(
     itemListState: LazyListState,
     navController: NavController,
     newsList: List<NewsEntity>,
-    loadErrorMessageState: MutableState<String>,
+    loadErrorState: MutableState<Boolean>,
     paginationEndReachedState: MutableState<Boolean>,
+    refreshingState: MutableState<Boolean>,
     loadNewsListPaginated: () -> Unit,
+    refreshNews: () -> Unit,
     loadedNewsItemCount: Int,
 ) {
-    var loadErrorMessage by remember { loadErrorMessageState }
+    val loadError by remember { loadErrorState }
     val paginationEndReached by remember { paginationEndReachedState }
 
-    Column {
-        if (loadErrorMessage.isNotBlank()) {
-            NoInternetBanner(
-                loadNewsListPaginated = {
-                    loadErrorMessage = ""
-                    loadNewsListPaginated()
+    val pullRefreshState = rememberPullRefreshState(refreshing = refreshingState.value, onRefresh = { refreshNews() })
+    Box(
+        modifier = Modifier
+            .pullRefresh(pullRefreshState)
+    ) {
+        Column {
+            if (loadError) {
+                NoInternetBanner(
+                    refreshNews = {
+                        refreshNews()
+                    }
+                )
+            }
+            LazyColumn(
+                state = itemListState
+            ) {
+                items(loadedNewsItemCount) {
+                    if (it >= loadedNewsItemCount - 1 && !paginationEndReached && !loadError) {
+                        loadNewsListPaginated()
+                    }
+                    DisplayNewsEntity(newsEntity = newsList[it], navController = navController)
                 }
-            )
-        }
-        LazyColumn(
-            state = itemListState
-        ) {
-            items(loadedNewsItemCount) {
-                if (it >= loadedNewsItemCount - 1 && !paginationEndReached) {
-                    loadNewsListPaginated()
-                }
-                DisplayNewsEntity(newsEntity = newsList[it], navController = navController)
             }
         }
+        PullRefreshIndicator(refreshingState.value, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 }
 
 @Composable
 fun NoInternetBanner(
-    loadNewsListPaginated: () -> Unit
+    refreshNews: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -201,7 +214,7 @@ fun NoInternetBanner(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
                         ) {
-                            loadNewsListPaginated()
+                            refreshNews()
                         }
                 )
             }
