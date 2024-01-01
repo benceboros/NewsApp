@@ -17,7 +17,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val newsDao: NewsDao
 ) : NewsRepository {
 
-    override fun convertArticlesToNewsEntities(articles: List<Article>?): List<NewsEntity> {
+    private fun convertArticlesToNewsEntities(articles: List<Article>?): List<NewsEntity> {
         return articles?.mapNotNull { article ->
             if (article.canBeSaved()) {
                 NewsEntity(
@@ -55,7 +55,7 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.deleteNewsEntities()
     }
 
-    override suspend fun getSelectedNewsEntity(id: Int): NewsEntity {
+    override suspend fun getSelectedNewsEntity(id: Int): NewsEntity? {
         return newsDao.getSelectedNewsEntity(id)
     }
 }
