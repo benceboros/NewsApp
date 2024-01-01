@@ -58,4 +58,6 @@
     <string name="unknown_publish_date">Unknown publish date</string>
     <string name="webpage_could_not_be_loaded">The requested webpage could not be loaded.</string>
     <string name="content_desc_ic_webpage_error">Article page error icon</string>
+    <string name="mockk">MockK</string>
+    <string name="url_mockk">https://mockk.io/</string>
 </resources>

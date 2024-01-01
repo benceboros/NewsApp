@@ -99,8 +99,8 @@ dependencies {
     testImplementation ("androidx.room:room-testing:2.6.1")
 
     // Mockk
-    testImplementation("io.mockk:mockk-android:1.13.8")
-    testImplementation("io.mockk:mockk-agent:1.13.8")
+    testImplementation("io.mockk:mockk-android:1.13.7")
+    testImplementation("io.mockk:mockk-agent:1.13.7")
 
     // Further libraries used for testing
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0-RC2")
