@@ -60,4 +60,6 @@
     <string name="content_desc_ic_webpage_error">Article page error icon</string>
     <string name="mockk">MockK</string>
     <string name="url_mockk">https://mockk.io/</string>
+    <string name="firebase_crashlytics">Firebase Crashlytics</string>
+    <string name="url_firebase_crashlytics">https://firebase.google.com/docs/crashlytics</string>
 </resources>
