@@ -1,4 +1,4 @@
-package com.example.newsapp.view
+package com.example.newsapp.view.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -58,6 +58,7 @@ import com.example.newsapp.ui.theme.NoInternetBannerDescStyle
 import com.example.newsapp.ui.theme.UseApplicationOfflineStyle
 import com.example.newsapp.ui.theme.newsDatePublishedStyle
 import com.example.newsapp.ui.theme.newsTitleListStyle
+import com.example.newsapp.view.PageLoader
 import com.example.newsapp.viewmodel.NewsListScreenViewModel
 
 @Composable

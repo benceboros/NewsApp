@@ -1,4 +1,4 @@
-package com.example.newsapp.view
+package com.example.newsapp.view.screens
 
 import android.content.Context
 import android.content.res.Configuration

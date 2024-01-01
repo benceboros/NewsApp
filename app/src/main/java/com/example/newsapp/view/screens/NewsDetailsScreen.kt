@@ -1,4 +1,4 @@
-package com.example.newsapp.view
+package com.example.newsapp.view.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +31,7 @@ import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
 import com.example.newsapp.ui.theme.newsDescriptionStyle
 import com.example.newsapp.ui.theme.newsTitleDetailStyle
 import com.example.newsapp.util.navigateToUrl
+import com.example.newsapp.view.PageLoader
 import com.example.newsapp.viewmodel.NewsDetailsScreenEvent
 import com.example.newsapp.viewmodel.NewsDetailsScreenViewModel
 

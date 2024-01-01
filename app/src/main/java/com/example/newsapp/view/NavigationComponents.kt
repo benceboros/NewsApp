@@ -38,13 +38,57 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.example.newsapp.R
 import com.example.newsapp.Routes
 import com.example.newsapp.model.MenuItem
 import com.example.newsapp.ui.theme.topAppBarTitleStyle
+import com.example.newsapp.view.screens.InfoScreen
+import com.example.newsapp.view.screens.NewsDetailsScreen
+import com.example.newsapp.view.screens.NewsListScreen
+import com.example.newsapp.view.screens.WebViewScreen
 import kotlinx.coroutines.launch
 
+
+@Composable
+fun Navigation(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = Routes.NEWS_LIST_SCREEN.id) {
+        composable(Routes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
+        composable(Routes.INFO_SCREEN.id) { InfoScreen(navController) }
+        composable(
+            route = Routes.NEWS_DETAILS_SCREEN.id.plus("/{id}"),
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                }
+            )
+        ) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getInt("id")?.let { newsId ->
+                NewsDetailsScreen(
+                    navController = navController,
+                    newsId = newsId
+                )
+            }
+        }
+        composable(
+            route = Routes.WEB_VIEW_SCREEN.id.plus("/{url}"),
+            arguments = listOf(
+                navArgument("url") {
+                    type = NavType.StringType
+                }
+            )
+        ) {navBackStackEntry ->
+            navBackStackEntry.arguments?.getString("url")?.let { url ->
+                WebViewScreen(urlToArticle = url)
+            }
+        }
+    }
+}
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

@@ -1,4 +1,4 @@
-package com.example.newsapp.view
+package com.example.newsapp.view.screens
 
 import android.graphics.Bitmap
 import android.view.View
@@ -25,6 +25,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.newsapp.R
 import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
+import com.example.newsapp.view.PageLoader
 import com.example.newsapp.viewmodel.WebViewScreenEvent
 import com.example.newsapp.viewmodel.WebViewScreenViewModel
 
