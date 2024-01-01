@@ -5,8 +5,6 @@ import com.example.newsapp.model.data.remote.respones.Article
 import com.example.newsapp.util.Resource
 
 interface NewsRepository {
-    fun convertArticlesToNewsEntities(articles: List<Article>?): List<NewsEntity>
-
     suspend fun getNewsResponseWithTotalResults(page: Int): Resource<Pair<List<NewsEntity>, Int?>>
 
     suspend fun insertNewsEntitiesToDb(newsEntitiesList: List<NewsEntity>)
@@ -15,5 +13,5 @@ interface NewsRepository {
 
     suspend fun deleteDb()
 
-    suspend fun getSelectedNewsEntity(id: Int): NewsEntity
+    suspend fun getSelectedNewsEntity(id: Int): NewsEntity?
 }

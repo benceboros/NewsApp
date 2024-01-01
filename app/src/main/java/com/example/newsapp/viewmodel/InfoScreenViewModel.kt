@@ -53,6 +53,10 @@ class InfoScreenViewModel @Inject constructor(
         TechnologyItem(
             name = context.getString(R.string.room),
             websiteUrl = context.getString(R.string.url_room)
+        ),
+        TechnologyItem(
+            name = context.getString(R.string.mockk),
+            websiteUrl = context.getString(R.string.url_mockk)
         )
     )
 

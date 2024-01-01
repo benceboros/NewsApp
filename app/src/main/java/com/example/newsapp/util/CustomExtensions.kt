@@ -1,23 +1,29 @@
 package com.example.newsapp.util
 
+import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.newsapp.R
 import com.example.newsapp.Routes
 import com.example.newsapp.model.data.remote.respones.Article
-import java.lang.Exception
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.Exception
 
 fun Article.canBeSaved(): Boolean =
     urlToImage != null && title != null && publishedAt != null
 
-fun String.formatToAppropriateDateFormat(): String {
-    val date = ZonedDateTime.parse(this)
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MMMM-dd HH:mm")
-    return date.format(formatter)
+fun String.formatToAppropriateDateFormat(): String? {
+    return try {
+        val date = ZonedDateTime.parse(this)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MMMM-dd HH:mm")
+        date.format(formatter)
+    } catch (e: Exception) {
+        Log.e("DateFormatException", "Reason: $e")
+        null
+    }
 }
 
 fun NavController.navigateToUrl(url: String?) {
