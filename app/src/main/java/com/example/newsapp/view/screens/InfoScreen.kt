@@ -1,4 +1,4 @@
-package com.example.newsapp.view
+package com.example.newsapp.view.screens
 
 import android.content.Context
 import android.content.res.Configuration
@@ -40,7 +40,12 @@ import com.example.newsapp.model.TechnologyItem
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.contactInfoHeaderStyle
 import com.example.newsapp.ui.theme.contactInfoStyle
+import com.example.newsapp.util.LocalAnalyticsHelper
+import com.example.newsapp.util.analytics.AnalyticsHelper
+import com.example.newsapp.util.analytics.TrackScreenViewEvent
+import com.example.newsapp.util.analytics.logContentSelect
 import com.example.newsapp.util.navigateToUrl
+import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.InfoScreenViewModel
 
 @Composable
@@ -49,6 +54,10 @@ fun InfoScreen(
     viewModel: InfoScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val analyticsHelper = LocalAnalyticsHelper.current
+
+    TrackScreenViewEvent(screenName = Routes.INFO_SCREEN.id)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +78,8 @@ fun InfoScreen(
         InfoHeader(headerTitle = stringResource(R.string.header_technologies_used))
         TechnologyList(
             navController = navController,
-            technologyList =  viewModel.getTechnologies(context)
+            technologyList = viewModel.getTechnologies(context),
+            analyticsHelper = analyticsHelper
         )
 
         InfoHeader(headerTitle = stringResource(R.string.header_contact))
@@ -77,7 +87,8 @@ fun InfoScreen(
             navController = navController,
             contactInfoItems = viewModel.getContactInformation(context),
             openDialer = viewModel::openDialer,
-            openEmailApp = viewModel::openEmailApp
+            openEmailApp = viewModel::openEmailApp,
+            analyticsHelper = analyticsHelper
         )
     }
 }
@@ -106,7 +117,8 @@ fun InfoHeader(
 @Composable
 fun TechnologyList(
     navController: NavController,
-    technologyList: List<TechnologyItem>
+    technologyList: List<TechnologyItem>,
+    analyticsHelper: AnalyticsHelper
 ) {
     Column {
         technologyList.forEach { item ->
@@ -119,7 +131,11 @@ fun TechnologyList(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
-                      navController.navigateToUrl(item.websiteUrl)
+                        analyticsHelper.logContentSelect(
+                            contentType = "technology website",
+                            itemId = item.name
+                        )
+                        navController.navigateToUrl(item.websiteUrl)
                     },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -145,7 +161,8 @@ fun ContactInformation(
     navController: NavController,
     contactInfoItems: List<ContactInformation>,
     openDialer: (context: Context, phoneNumber: String) -> Unit,
-    openEmailApp: (context: Context, emailAddress: String) -> Unit
+    openEmailApp: (context: Context, emailAddress: String) -> Unit,
+    analyticsHelper: AnalyticsHelper
 ) {
     val context = LocalContext.current
     Column {
@@ -161,14 +178,26 @@ fun ContactInformation(
                     ) {
                         when (item.type) {
                             ContactInformationType.PHONE -> {
+                                analyticsHelper.logContentSelect(
+                                    contentType = "phone number",
+                                    itemId = item.typeName
+                                )
                                 openDialer(context, item.value)
                             }
 
                             ContactInformationType.EMAIL -> {
+                                analyticsHelper.logContentSelect(
+                                    contentType = "email address",
+                                    itemId = item.typeName
+                                )
                                 openEmailApp(context, item.value)
                             }
 
                             ContactInformationType.LINKEDIN -> {
+                                analyticsHelper.logContentSelect(
+                                    contentType = "linkedin page",
+                                    itemId = item.typeName
+                                )
                                 navController.navigateToUrl(item.value)
                             }
                         }

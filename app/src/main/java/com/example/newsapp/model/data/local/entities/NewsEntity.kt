@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class NewsEntity (
+data class NewsEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val imageUrl: String?,
     val title: String?,
