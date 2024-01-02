@@ -48,6 +48,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
+import com.example.newsapp.model.NavigationRoutes
 import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.LightRed
 import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
@@ -65,7 +66,6 @@ import com.example.newsapp.util.analytics.logButtonClick
 import com.example.newsapp.util.analytics.logContentSelect
 import com.example.newsapp.util.analytics.logItemSelect
 import com.example.newsapp.view.PageLoader
-import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.NewsListScreenViewModel
 
 @Composable
@@ -84,7 +84,7 @@ fun NewsListScreen(
 
     val itemListState: LazyListState = rememberLazyListState()
 
-    TrackScreenViewEvent(screenName = Routes.NEWS_LIST_SCREEN.id)
+    TrackScreenViewEvent(screenName = NavigationRoutes.NEWS_LIST_SCREEN.id)
 
     if (isLoadingInitialNews) {
         PageLoader()
@@ -341,7 +341,7 @@ fun DisplayNewsEntity(
                     contentType = "news article",
                     itemId = newsEntity.id?.toString() ?: UNKNOWN_ID_FOR_ANALYTICS
                 )
-                navController.navigate("${Routes.NEWS_DETAILS_SCREEN.id}/${newsEntity.id}")
+                navController.navigate("${NavigationRoutes.NEWS_DETAILS_SCREEN.id}/${newsEntity.id}")
             },
         colors = CardDefaults.cardColors(
             containerColor = Color.White

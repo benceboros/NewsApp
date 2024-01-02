@@ -64,4 +64,5 @@
     <string name="url_firebase_crashlytics">https://firebase.google.com/docs/crashlytics</string>
     <string name="google_analytics">Google Analytics</string>
     <string name="url_google_analytics">https://firebase.google.com/docs/analytics/</string>
+    <string name="page_loader_content_desc">Page loader</string>
 </resources>

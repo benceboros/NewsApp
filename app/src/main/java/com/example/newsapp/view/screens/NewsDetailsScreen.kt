@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
+import com.example.newsapp.model.NavigationRoutes
 import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
 import com.example.newsapp.ui.theme.newsDescriptionStyle
@@ -35,7 +36,6 @@ import com.example.newsapp.util.analytics.TrackScreenViewEvent
 import com.example.newsapp.util.analytics.logButtonClick
 import com.example.newsapp.util.navigateToUrl
 import com.example.newsapp.view.PageLoader
-import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.NewsDetailsScreenEvent
 import com.example.newsapp.viewmodel.NewsDetailsScreenViewModel
 
@@ -49,7 +49,7 @@ fun NewsDetailsScreen(
         viewModel.onEvent(NewsDetailsScreenEvent.NewsItemSelected(newsId))
     }
 
-    TrackScreenViewEvent(screenName = Routes.NEWS_DETAILS_SCREEN.id)
+    TrackScreenViewEvent(screenName = NavigationRoutes.NEWS_DETAILS_SCREEN.id)
 
     if (viewModel.state.selectedNewsEntity != null) {
         DisplayNewsItemDetails(newsEntity = viewModel.state.selectedNewsEntity, navController = navController)

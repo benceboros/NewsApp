@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -19,8 +20,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,9 +46,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.newsapp.R
 import com.example.newsapp.model.MenuItem
+import com.example.newsapp.model.NavigationRoutes
+import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.theme.topAppBarTitleStyle
 import com.example.newsapp.util.LocalAnalyticsHelper
 import com.example.newsapp.util.analytics.AnalyticsHelper
@@ -56,21 +62,36 @@ import com.example.newsapp.view.screens.NewsListScreen
 import com.example.newsapp.view.screens.WebViewScreen
 import kotlinx.coroutines.launch
 
-
-enum class Routes(val id: String) {
-    NEWS_LIST_SCREEN("NewsListScreen"),
-    NEWS_DETAILS_SCREEN("NewsDetailsScreen"),
-    INFO_SCREEN("InfoScreen"),
-    WEB_VIEW_SCREEN("WebViewScreen"),
+@Composable
+fun InitAppWithNavigationComponents(startDestination: String) {
+    NewsAppTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            val navController = rememberNavController()
+            val scaffoldState = rememberScaffoldState()
+            ScreenScaffoldWithMenu(
+                navController = navController,
+                scaffoldState = scaffoldState,
+                scaffoldContent = {
+                    Navigation(
+                        navController = navController,
+                        startDestination = startDestination
+                    )
+                }
+            )
+        }
+    }
 }
 
 @Composable
-fun Navigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Routes.NEWS_LIST_SCREEN.id) {
-        composable(Routes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
-        composable(Routes.INFO_SCREEN.id) { InfoScreen(navController) }
+fun Navigation(
+    navController: NavHostController,
+    startDestination: String
+) {
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(NavigationRoutes.NEWS_LIST_SCREEN.id) { NewsListScreen(navController) }
+        composable(NavigationRoutes.INFO_SCREEN.id) { InfoScreen(navController) }
         composable(
-            route = Routes.NEWS_DETAILS_SCREEN.id.plus("/{id}"),
+            route = NavigationRoutes.NEWS_DETAILS_SCREEN.id.plus("/{id}"),
             arguments = listOf(
                 navArgument("id") {
                     type = NavType.IntType
@@ -85,7 +106,7 @@ fun Navigation(navController: NavHostController) {
             }
         }
         composable(
-            route = Routes.WEB_VIEW_SCREEN.id.plus("/{url}"),
+            route = NavigationRoutes.WEB_VIEW_SCREEN.id.plus("/{url}"),
             arguments = listOf(
                 navArgument("url") {
                     type = NavType.StringType
@@ -136,25 +157,25 @@ fun ScreenScaffoldWithMenu(
             NavigationDrawerBody(
                 items = listOf(
                     MenuItem(
-                        id = Routes.NEWS_LIST_SCREEN.id,
+                        id = NavigationRoutes.NEWS_LIST_SCREEN.id,
                         title = stringResource(R.string.menu_item_news_list),
                         contentDescription = stringResource(R.string.content_desc_go_to_news_list_screen),
                         icon = Icons.Default.Home
                     ),
                     MenuItem(
-                        id = Routes.INFO_SCREEN.id,
+                        id = NavigationRoutes.INFO_SCREEN.id,
                         title = stringResource(R.string.menu_item_info),
                         contentDescription = stringResource(R.string.content_desc_go_to_information_screen),
                         icon = Icons.Default.Info
                     )
                 ),
                 onItemClick = {
-                    if (navController.currentBackStackEntry?.destination?.route == Routes.NEWS_LIST_SCREEN.id) {
-                        if (it.id == Routes.INFO_SCREEN.id) {
+                    if (navController.currentBackStackEntry?.destination?.route == NavigationRoutes.NEWS_LIST_SCREEN.id) {
+                        if (it.id == NavigationRoutes.INFO_SCREEN.id) {
                             navController.navigate(it.id)
                         }
                     } else {
-                        if (it.id == Routes.NEWS_LIST_SCREEN.id) {
+                        if (it.id == NavigationRoutes.NEWS_LIST_SCREEN.id) {
                             navController.popBackStack()
                         }
                     }
@@ -189,7 +210,7 @@ fun AppBar(
         contentColor = MaterialTheme.colorScheme.onPrimary,
         navigationIcon = {
             when (currentBackStackEntry?.destination?.route) {
-                Routes.NEWS_LIST_SCREEN.id, Routes.INFO_SCREEN.id -> {
+                NavigationRoutes.NEWS_LIST_SCREEN.id, NavigationRoutes.INFO_SCREEN.id -> {
                     IconButton(onClick = onMenuIconClick) {
                         androidx.compose.material.Icon(
                             imageVector = Icons.Default.Menu,
