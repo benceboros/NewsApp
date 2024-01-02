@@ -64,5 +64,11 @@
     <string name="url_firebase_crashlytics">https://firebase.google.com/docs/crashlytics</string>
     <string name="google_analytics">Google Analytics</string>
     <string name="url_google_analytics">https://firebase.google.com/docs/analytics/</string>
-    <string name="page_loader_content_desc">Page loader</string>
+    <string name="content_desc_page_loader">Page loader</string>
+    <string name="content_desc_btn_retry">Retry button</string>
+    <string name="content_desc_use_offline">use the application offline button</string>
+    <string name="content_desc_image_container">Image container</string>
+    <string name="content_desc_news_article_title">news article title</string>
+    <string name="content_desc_news_article_publish_date">news article publish date</string>
+    <string name="content_desc_clickable_news_article">clickable news article</string>
 </resources>
