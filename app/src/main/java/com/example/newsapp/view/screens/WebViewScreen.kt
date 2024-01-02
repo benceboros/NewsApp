@@ -24,10 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.newsapp.R
+import com.example.newsapp.model.NavigationRoutes
 import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
 import com.example.newsapp.util.analytics.TrackScreenViewEvent
 import com.example.newsapp.view.PageLoader
-import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.WebViewScreenEvent
 import com.example.newsapp.viewmodel.WebViewScreenViewModel
 
@@ -36,7 +36,7 @@ fun WebViewScreen(
     urlToArticle: String,
     viewModel: WebViewScreenViewModel = hiltViewModel()
 ) {
-    TrackScreenViewEvent(screenName = Routes.WEB_VIEW_SCREEN.id)
+    TrackScreenViewEvent(screenName = NavigationRoutes.WEB_VIEW_SCREEN.id)
 
     if (viewModel.state.isLoading) {
         PageLoader()

@@ -4,8 +4,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.newsapp.R
+import com.example.newsapp.model.NavigationRoutes
 import com.example.newsapp.model.data.remote.respones.Article
-import com.example.newsapp.view.Routes
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
@@ -30,7 +30,7 @@ fun NavController.navigateToUrl(url: String?) {
     if (url != null) {
         try {
             val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-            navigate("${Routes.WEB_VIEW_SCREEN.id}/$encodedUrl")
+            navigate("${NavigationRoutes.WEB_VIEW_SCREEN.id}/$encodedUrl")
         } catch (e: Exception) {
             Toast.makeText(context, context.getString(R.string.error_msg_failed_to_open_url), Toast.LENGTH_SHORT).show()
         }

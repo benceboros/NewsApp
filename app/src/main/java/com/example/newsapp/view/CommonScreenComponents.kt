@@ -7,13 +7,21 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.example.newsapp.R
 
 @Composable
 fun PageLoader() {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .semantics {
+                contentDescription = context.getString(R.string.content_desc_page_loader)
+            },
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(

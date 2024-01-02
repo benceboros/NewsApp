@@ -1,5 +1,6 @@
 package com.example.newsapp.view.screens
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,8 +39,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +52,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
+import com.example.newsapp.model.NavigationRoutes
 import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.LightRed
 import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
@@ -65,7 +70,6 @@ import com.example.newsapp.util.analytics.logButtonClick
 import com.example.newsapp.util.analytics.logContentSelect
 import com.example.newsapp.util.analytics.logItemSelect
 import com.example.newsapp.view.PageLoader
-import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.NewsListScreenViewModel
 
 @Composable
@@ -74,6 +78,7 @@ fun NewsListScreen(
     viewModel: NewsListScreenViewModel = hiltViewModel()
 ) {
     val analyticsHelper = LocalAnalyticsHelper.current
+    val context = LocalContext.current
 
     val newsList by remember { viewModel.newsList }
     val isLoadingInitialNews by remember { viewModel.isLoadingInitialNews }
@@ -84,7 +89,7 @@ fun NewsListScreen(
 
     val itemListState: LazyListState = rememberLazyListState()
 
-    TrackScreenViewEvent(screenName = Routes.NEWS_LIST_SCREEN.id)
+    TrackScreenViewEvent(screenName = NavigationRoutes.NEWS_LIST_SCREEN.id)
 
     if (isLoadingInitialNews) {
         PageLoader()
@@ -100,14 +105,16 @@ fun NewsListScreen(
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 refreshNews = viewModel::refreshNews,
                 loadedNewsItemCount = newsList.size,
-                analyticsHelper = analyticsHelper
+                analyticsHelper = analyticsHelper,
+                context = context
             )
         }
         if (loadError && newsList.isEmpty()) {
             DisplayNoInternetWithNoNews(
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 loadDbSavedNews = viewModel::loadDbSavedNews,
-                analyticsHelper = analyticsHelper
+                analyticsHelper = analyticsHelper,
+                context = context
             )
             if (noOfflineNews) {
                 NoOfflineNewsDialog(
@@ -165,7 +172,8 @@ fun DisplayNewsEntityList(
     loadNewsListPaginated: () -> Unit,
     refreshNews: () -> Unit,
     loadedNewsItemCount: Int,
-    analyticsHelper: AnalyticsHelper
+    analyticsHelper: AnalyticsHelper,
+    context: Context
 ) {
     val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = { refreshNews() })
     Box(
@@ -191,7 +199,8 @@ fun DisplayNewsEntityList(
                     DisplayNewsEntity(
                         newsEntity = newsList[it],
                         navController = navController,
-                        analyticsHelper = analyticsHelper
+                        analyticsHelper = analyticsHelper,
+                        context = context
                     )
                 }
             }
@@ -259,7 +268,8 @@ fun NoInternetBanner(
 fun DisplayNoInternetWithNoNews(
     loadNewsListPaginated: () -> Unit,
     loadDbSavedNews: () -> Unit,
-    analyticsHelper: AnalyticsHelper
+    analyticsHelper: AnalyticsHelper,
+    context: Context
 ) {
     Box(
         modifier = Modifier
@@ -296,6 +306,9 @@ fun DisplayNoInternetWithNoNews(
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 8.dp)
+                    .semantics {
+                        contentDescription = context.getString(R.string.content_desc_btn_retry)
+                    }
             ) {
                 Text(
                     text = stringResource(R.string.btn_retry).uppercase(),
@@ -309,6 +322,9 @@ fun DisplayNoInternetWithNoNews(
                             buttonId = "use_app_offline_button"
                         )
                         loadDbSavedNews()
+                    }
+                    .semantics {
+                        contentDescription = context.getString(R.string.content_desc_use_offline)
                     },
                 text = stringResource(R.string.use_offline),
                 style = UseApplicationOfflineStyle
@@ -321,7 +337,8 @@ fun DisplayNoInternetWithNoNews(
 fun DisplayNewsEntity(
     newsEntity: NewsEntity,
     navController: NavController,
-    analyticsHelper: AnalyticsHelper
+    analyticsHelper: AnalyticsHelper,
+    context: Context
 ) {
     var imageIsLoading by remember { mutableStateOf(false) }
 
@@ -341,7 +358,10 @@ fun DisplayNewsEntity(
                     contentType = "news article",
                     itemId = newsEntity.id?.toString() ?: UNKNOWN_ID_FOR_ANALYTICS
                 )
-                navController.navigate("${Routes.NEWS_DETAILS_SCREEN.id}/${newsEntity.id}")
+                navController.navigate("${NavigationRoutes.NEWS_DETAILS_SCREEN.id}/${newsEntity.id}")
+            }
+            .semantics {
+                contentDescription = context.getString(R.string.content_desc_clickable_news_article)
             },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -356,7 +376,10 @@ fun DisplayNewsEntity(
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .weight(5F),
+                    .weight(5F)
+                    .semantics {
+                        contentDescription = context.getString(R.string.content_desc_image_container)
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 if (imageIsLoading) {
@@ -386,11 +409,19 @@ fun DisplayNewsEntity(
                     text = newsEntity.title ?: stringResource(id = R.string.unknown_title),
                     style = newsTitleListStyle,
                     maxLines = 4,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .semantics {
+                            contentDescription = context.getString(R.string.content_desc_news_article_title)
+                        }
                 )
                 Text(
                     text = newsEntity.publishDate ?: stringResource(id = R.string.unknown_publish_date),
-                    style = newsDatePublishedStyle
+                    style = newsDatePublishedStyle,
+                    modifier = Modifier
+                        .semantics {
+                            contentDescription = context.getString(R.string.content_desc_news_article_publish_date)
+                        }
                 )
             }
         }
