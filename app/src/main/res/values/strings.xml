@@ -62,4 +62,6 @@
     <string name="url_mockk">https://mockk.io/</string>
     <string name="firebase_crashlytics">Firebase Crashlytics</string>
     <string name="url_firebase_crashlytics">https://firebase.google.com/docs/crashlytics</string>
+    <string name="google_analytics">Google Analytics</string>
+    <string name="url_google_analytics">https://firebase.google.com/docs/analytics/</string>
 </resources>

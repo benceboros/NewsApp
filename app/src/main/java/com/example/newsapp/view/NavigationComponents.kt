@@ -45,15 +45,24 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.newsapp.R
-import com.example.newsapp.Routes
 import com.example.newsapp.model.MenuItem
 import com.example.newsapp.ui.theme.topAppBarTitleStyle
+import com.example.newsapp.util.LocalAnalyticsHelper
+import com.example.newsapp.util.analytics.AnalyticsHelper
+import com.example.newsapp.util.analytics.logButtonClick
 import com.example.newsapp.view.screens.InfoScreen
 import com.example.newsapp.view.screens.NewsDetailsScreen
 import com.example.newsapp.view.screens.NewsListScreen
 import com.example.newsapp.view.screens.WebViewScreen
 import kotlinx.coroutines.launch
 
+
+enum class Routes(val id: String) {
+    NEWS_LIST_SCREEN("NewsListScreen"),
+    NEWS_DETAILS_SCREEN("NewsDetailsScreen"),
+    INFO_SCREEN("InfoScreen"),
+    WEB_VIEW_SCREEN("WebViewScreen"),
+}
 
 @Composable
 fun Navigation(navController: NavHostController) {
@@ -82,7 +91,7 @@ fun Navigation(navController: NavHostController) {
                     type = NavType.StringType
                 }
             )
-        ) {navBackStackEntry ->
+        ) { navBackStackEntry ->
             navBackStackEntry.arguments?.getString("url")?.let { url ->
                 WebViewScreen(urlToArticle = url)
             }
@@ -97,6 +106,7 @@ fun ScreenScaffoldWithMenu(
     scaffoldState: ScaffoldState,
     scaffoldContent: @Composable () -> Unit
 ) {
+    val analyticsHelper = LocalAnalyticsHelper.current
     val scope = rememberCoroutineScope()
     Scaffold(
         scaffoldState = scaffoldState,
@@ -105,11 +115,17 @@ fun ScreenScaffoldWithMenu(
             AppBar(
                 navController = navController,
                 onMenuIconClick = {
+                    analyticsHelper.logButtonClick(
+                        buttonId = "menu_button"
+                    )
                     scope.launch {
                         scaffoldState.drawerState.open()
                     }
                 },
                 onBackIconClick = {
+                    analyticsHelper.logButtonClick(
+                        buttonId = "back_button"
+                    )
                     navController.popBackStack()
                 }
             )
@@ -145,7 +161,8 @@ fun ScreenScaffoldWithMenu(
                     scope.launch {
                         scaffoldState.drawerState.close()
                     }
-                }
+                },
+                analyticsHelper = analyticsHelper
             )
         },
         content = {
@@ -180,6 +197,7 @@ fun AppBar(
                         )
                     }
                 }
+
                 else -> {
                     IconButton(onClick = onBackIconClick) {
                         androidx.compose.material.Icon(
@@ -209,7 +227,8 @@ fun NavigationDrawerHeader() {
 @Composable
 fun NavigationDrawerBody(
     items: List<MenuItem>,
-    onItemClick: (MenuItem) -> Unit
+    onItemClick: (MenuItem) -> Unit,
+    analyticsHelper: AnalyticsHelper
 ) {
     LazyColumn {
         items(items) { item ->
@@ -217,6 +236,9 @@ fun NavigationDrawerBody(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
+                        analyticsHelper.logButtonClick(
+                            buttonId = item.title.plus("_button")
+                        )
                         onItemClick(item)
                     }
                     .padding(16.dp)

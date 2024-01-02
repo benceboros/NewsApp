@@ -17,8 +17,8 @@ import javax.inject.Singleton
 object NetworkModule {
     private val moshi =
         Moshi.Builder()
-         .add(KotlinJsonAdapterFactory())
-         .build()
+            .add(KotlinJsonAdapterFactory())
+            .build()
 
     @Singleton
     @Provides

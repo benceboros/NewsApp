@@ -30,8 +30,12 @@ import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.newsDateAndAuthorStyle
 import com.example.newsapp.ui.theme.newsDescriptionStyle
 import com.example.newsapp.ui.theme.newsTitleDetailStyle
+import com.example.newsapp.util.LocalAnalyticsHelper
+import com.example.newsapp.util.analytics.TrackScreenViewEvent
+import com.example.newsapp.util.analytics.logButtonClick
 import com.example.newsapp.util.navigateToUrl
 import com.example.newsapp.view.PageLoader
+import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.NewsDetailsScreenEvent
 import com.example.newsapp.viewmodel.NewsDetailsScreenViewModel
 
@@ -45,6 +49,8 @@ fun NewsDetailsScreen(
         viewModel.onEvent(NewsDetailsScreenEvent.NewsItemSelected(newsId))
     }
 
+    TrackScreenViewEvent(screenName = Routes.NEWS_DETAILS_SCREEN.id)
+
     if (viewModel.state.selectedNewsEntity != null) {
         DisplayNewsItemDetails(newsEntity = viewModel.state.selectedNewsEntity, navController = navController)
     } else {
@@ -55,6 +61,7 @@ fun NewsDetailsScreen(
 @Composable
 fun DisplayNewsItemDetails(newsEntity: NewsEntity?, navController: NavController) {
     var imageIsLoading by remember { mutableStateOf(false) }
+    val analyticsHelper = LocalAnalyticsHelper.current
 
     Column(
         modifier = Modifier
@@ -117,6 +124,9 @@ fun DisplayNewsItemDetails(newsEntity: NewsEntity?, navController: NavController
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = {
+                    analyticsHelper.logButtonClick(
+                        buttonId = "read_full_article_online_button"
+                    )
                     navController.navigateToUrl(newsEntity?.urlToArticle)
                 },
                 shape = RectangleShape,

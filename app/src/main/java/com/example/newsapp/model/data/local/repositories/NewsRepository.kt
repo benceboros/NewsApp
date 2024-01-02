@@ -1,7 +1,6 @@
 package com.example.newsapp.model.data.local.repositories
 
 import com.example.newsapp.model.data.local.entities.NewsEntity
-import com.example.newsapp.model.data.remote.respones.Article
 import com.example.newsapp.util.Resource
 
 interface NewsRepository {

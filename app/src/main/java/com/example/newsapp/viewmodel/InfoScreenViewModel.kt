@@ -61,6 +61,10 @@ class InfoScreenViewModel @Inject constructor(
         TechnologyItem(
             name = context.getString(R.string.firebase_crashlytics),
             websiteUrl = context.getString(R.string.url_firebase_crashlytics)
+        ),
+        TechnologyItem(
+            name = context.getString(R.string.google_analytics),
+            websiteUrl = context.getString(R.string.url_google_analytics)
         )
     )
 

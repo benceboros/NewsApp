@@ -48,7 +48,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
-import com.example.newsapp.Routes
 import com.example.newsapp.model.data.local.entities.NewsEntity
 import com.example.newsapp.ui.theme.LightRed
 import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
@@ -58,7 +57,15 @@ import com.example.newsapp.ui.theme.NoInternetBannerDescStyle
 import com.example.newsapp.ui.theme.UseApplicationOfflineStyle
 import com.example.newsapp.ui.theme.newsDatePublishedStyle
 import com.example.newsapp.ui.theme.newsTitleListStyle
+import com.example.newsapp.util.Constants.UNKNOWN_ID_FOR_ANALYTICS
+import com.example.newsapp.util.LocalAnalyticsHelper
+import com.example.newsapp.util.analytics.AnalyticsHelper
+import com.example.newsapp.util.analytics.TrackScreenViewEvent
+import com.example.newsapp.util.analytics.logButtonClick
+import com.example.newsapp.util.analytics.logContentSelect
+import com.example.newsapp.util.analytics.logItemSelect
 import com.example.newsapp.view.PageLoader
+import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.NewsListScreenViewModel
 
 @Composable
@@ -66,6 +73,8 @@ fun NewsListScreen(
     navController: NavController,
     viewModel: NewsListScreenViewModel = hiltViewModel()
 ) {
+    val analyticsHelper = LocalAnalyticsHelper.current
+
     val newsList by remember { viewModel.newsList }
     val isLoadingInitialNews by remember { viewModel.isLoadingInitialNews }
     val loadError by remember { viewModel.loadError }
@@ -74,6 +83,8 @@ fun NewsListScreen(
     val noOfflineNews by remember { viewModel.noOfflineNews }
 
     val itemListState: LazyListState = rememberLazyListState()
+
+    TrackScreenViewEvent(screenName = Routes.NEWS_LIST_SCREEN.id)
 
     if (isLoadingInitialNews) {
         PageLoader()
@@ -88,17 +99,20 @@ fun NewsListScreen(
                 refreshing = refreshing,
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
                 refreshNews = viewModel::refreshNews,
-                loadedNewsItemCount = newsList.size
+                loadedNewsItemCount = newsList.size,
+                analyticsHelper = analyticsHelper
             )
         }
         if (loadError && newsList.isEmpty()) {
             DisplayNoInternetWithNoNews(
                 loadNewsListPaginated = viewModel::loadNewsListPaginated,
-                loadDbSavedNews = viewModel::loadDbSavedNews
+                loadDbSavedNews = viewModel::loadDbSavedNews,
+                analyticsHelper = analyticsHelper
             )
             if (noOfflineNews) {
                 NoOfflineNewsDialog(
-                    closeNoOfflineNewsDialog = viewModel::closeNoOfflineNewsDialog
+                    closeNoOfflineNewsDialog = viewModel::closeNoOfflineNewsDialog,
+                    analyticsHelper = analyticsHelper
                 )
             }
         }
@@ -108,6 +122,7 @@ fun NewsListScreen(
 @Composable
 fun NoOfflineNewsDialog(
     closeNoOfflineNewsDialog: () -> Unit,
+    analyticsHelper: AnalyticsHelper
 ) {
     AlertDialog(
         containerColor = Color.White,
@@ -126,6 +141,9 @@ fun NoOfflineNewsDialog(
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 onClick = {
+                    analyticsHelper.logButtonClick(
+                        buttonId = "no_offline_news_ok_button"
+                    )
                     closeNoOfflineNewsDialog()
                 }
             ) {
@@ -147,6 +165,7 @@ fun DisplayNewsEntityList(
     loadNewsListPaginated: () -> Unit,
     refreshNews: () -> Unit,
     loadedNewsItemCount: Int,
+    analyticsHelper: AnalyticsHelper
 ) {
     val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = { refreshNews() })
     Box(
@@ -158,7 +177,8 @@ fun DisplayNewsEntityList(
                 NoInternetBanner(
                     refreshNews = {
                         refreshNews()
-                    }
+                    },
+                    analyticsHelper = analyticsHelper
                 )
             }
             LazyColumn(
@@ -168,7 +188,11 @@ fun DisplayNewsEntityList(
                     if (it >= loadedNewsItemCount - 1 && !paginationEndReached && !loadError) {
                         loadNewsListPaginated()
                     }
-                    DisplayNewsEntity(newsEntity = newsList[it], navController = navController)
+                    DisplayNewsEntity(
+                        newsEntity = newsList[it],
+                        navController = navController,
+                        analyticsHelper = analyticsHelper
+                    )
                 }
             }
         }
@@ -178,7 +202,8 @@ fun DisplayNewsEntityList(
 
 @Composable
 fun NoInternetBanner(
-    refreshNews: () -> Unit
+    refreshNews: () -> Unit,
+    analyticsHelper: AnalyticsHelper
 ) {
     Box(
         modifier = Modifier
@@ -219,6 +244,9 @@ fun NoInternetBanner(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
                         ) {
+                            analyticsHelper.logButtonClick(
+                                buttonId = "banner_try_again_button"
+                            )
                             refreshNews()
                         }
                 )
@@ -230,7 +258,8 @@ fun NoInternetBanner(
 @Composable
 fun DisplayNoInternetWithNoNews(
     loadNewsListPaginated: () -> Unit,
-    loadDbSavedNews: () -> Unit
+    loadDbSavedNews: () -> Unit,
+    analyticsHelper: AnalyticsHelper
 ) {
     Box(
         modifier = Modifier
@@ -258,6 +287,9 @@ fun DisplayNoInternetWithNoNews(
 
             Button(
                 onClick = {
+                    analyticsHelper.logButtonClick(
+                        buttonId = "retry_button"
+                    )
                     loadNewsListPaginated()
                 },
                 shape = RectangleShape,
@@ -273,6 +305,9 @@ fun DisplayNoInternetWithNoNews(
             Text(
                 modifier = Modifier
                     .clickable {
+                        analyticsHelper.logButtonClick(
+                            buttonId = "use_app_offline_button"
+                        )
                         loadDbSavedNews()
                     },
                 text = stringResource(R.string.use_offline),
@@ -285,7 +320,8 @@ fun DisplayNoInternetWithNoNews(
 @Composable
 fun DisplayNewsEntity(
     newsEntity: NewsEntity,
-    navController: NavController
+    navController: NavController,
+    analyticsHelper: AnalyticsHelper
 ) {
     var imageIsLoading by remember { mutableStateOf(false) }
 
@@ -297,6 +333,14 @@ fun DisplayNewsEntity(
             .fillMaxWidth()
             .padding(5.dp)
             .clickable {
+                analyticsHelper.logItemSelect(
+                    itemId = newsEntity.id?.toString() ?: UNKNOWN_ID_FOR_ANALYTICS,
+                    itemName = newsEntity.title!!.toString()
+                )
+                analyticsHelper.logContentSelect(
+                    contentType = "news article",
+                    itemId = newsEntity.id?.toString() ?: UNKNOWN_ID_FOR_ANALYTICS
+                )
                 navController.navigate("${Routes.NEWS_DETAILS_SCREEN.id}/${newsEntity.id}")
             },
         colors = CardDefaults.cardColors(

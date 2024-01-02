@@ -4,8 +4,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.newsapp.R
-import com.example.newsapp.Routes
 import com.example.newsapp.model.data.remote.respones.Article
+import com.example.newsapp.view.Routes
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime

@@ -25,7 +25,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.newsapp.R
 import com.example.newsapp.ui.theme.LoadErrorDescriptionStyle
+import com.example.newsapp.util.analytics.TrackScreenViewEvent
 import com.example.newsapp.view.PageLoader
+import com.example.newsapp.view.Routes
 import com.example.newsapp.viewmodel.WebViewScreenEvent
 import com.example.newsapp.viewmodel.WebViewScreenViewModel
 
@@ -34,6 +36,8 @@ fun WebViewScreen(
     urlToArticle: String,
     viewModel: WebViewScreenViewModel = hiltViewModel()
 ) {
+    TrackScreenViewEvent(screenName = Routes.WEB_VIEW_SCREEN.id)
+
     if (viewModel.state.isLoading) {
         PageLoader()
     }
@@ -76,7 +80,7 @@ fun WebViewPage(
                         error: WebResourceError?
                     ) {
                         super.onReceivedError(view, request, error)
-                        if ((error?.description == "net::ERR_NAME_NOT_RESOLVED")) {
+                        if ((error?.description == "net::ERR_NAME_NOT_RESOLVED") || error?.description == "net::ERR_INTERNET_DISCONNECTED") {
                             onWebViewScreenEvent(WebViewScreenEvent.OnLoadingError)
                         }
                     }
