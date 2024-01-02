@@ -19,6 +19,7 @@ class UITestManager(
 ) {
     @Inject
     lateinit var newsListScreenViewModel: NewsListScreenViewModel
+
     @Inject
     lateinit var infoScreenViewModel: InfoScreenViewModel
 
@@ -44,16 +45,18 @@ class UITestManager(
     private val noNetworkIconContentDesc = composeTestRule.activity.getString(R.string.content_desc_no_network_icon)
     private val newsCouldNotBeLoadedText = composeTestRule.activity.getString(R.string.news_could_not_be_loaded)
     private val retryButtonContentDesc = composeTestRule.activity.getString(R.string.content_desc_btn_retry)
-    private val retryButtonText = composeTestRule.activity.getString(R.string.btn_retry)
     private val useOfflineButtonContentDesc = composeTestRule.activity.getString(R.string.content_desc_use_offline)
-    private val useOfflineButtonText = composeTestRule.activity.getString(R.string.use_offline)
+
     /**
-     * Components related to NewsListScreen when there are news articles in the list
+     * Components related to News entities
      */
     private val clickableNewsArticleContentDesc = composeTestRule.activity.getString(R.string.content_desc_clickable_news_article)
     private val newsEntityImageContainerContentDesc = composeTestRule.activity.getString(R.string.content_desc_image_container)
     private val newsEntityTitleContentDesc = composeTestRule.activity.getString(R.string.content_desc_news_article_title)
     private val newsEntityPublishDateContentDesc = composeTestRule.activity.getString(R.string.content_desc_news_article_publish_date)
+    private val newsEntityDescriptionContentDesc = composeTestRule.activity.getString(R.string.content_desc_news_article_description)
+    private val newsEntityAuthorContentDesc = composeTestRule.activity.getString(R.string.content_desc_news_article_author)
+    private val newsEntityReadFullArticleOnlineButtonContentDesc = composeTestRule.activity.getString(R.string.content_desc_news_article_author)
 
     /**
      * Components related to InfoScreen
@@ -89,6 +92,7 @@ class UITestManager(
             }
         }
     }
+
     fun checkIfMenuIsVisible() {
         openMenu()
         composeTestRule.apply {
@@ -101,22 +105,23 @@ class UITestManager(
             onNodeWithContentDescription(menuItemInfoContentDesc).assertExists()
         }
     }
+
     private fun openMenu() {
-        composeTestRule.apply {
-            composeTestRule.onNodeWithContentDescription(toggleMenuContentDesc).performClick()
-        }
+        composeTestRule.onNodeWithContentDescription(toggleMenuContentDesc).performClick()
     }
+
+    fun navigateBackWithMenuItem() {
+        composeTestRule.onNodeWithContentDescription(goBackToPreviousScreenContentDesc).performClick()
+    }
+
     fun navigateToInfoScreen() {
-        composeTestRule.apply {
-            openMenu()
-            onNodeWithContentDescription(menuItemInfoContentDesc).performClick()
-        }
+        openMenu()
+        composeTestRule.onNodeWithContentDescription(menuItemInfoContentDesc).performClick()
     }
+
     fun navigateToNewsListScreen() {
-        composeTestRule.apply {
-            openMenu()
-            onNodeWithContentDescription(menuItemNewsListContentDesc).performClick()
-        }
+        openMenu()
+        composeTestRule.onNodeWithContentDescription(menuItemNewsListContentDesc).performClick()
     }
 
 
@@ -125,12 +130,13 @@ class UITestManager(
      */
     fun checkNewsListScreenComponents(
         shouldComponentsBeVisible: Boolean,
-        shouldToggleMenuBeVisible: Boolean = true
+        shouldToggleMenuBeVisible: Boolean = true,
+        shouldPageLoaderBeVisible: Boolean = true
     ) {
         checkTopAppBarComponents(shouldToggleMenuBeVisible)
-        checkPageLoader(shouldComponentsBeVisible)
+        checkPageLoader(shouldPageLoaderBeVisible)
         // Giving time for loading the items
-        Thread.sleep(2000)
+        Thread.sleep(2500)
         if (newsListScreenViewModel.newsList.value.isEmpty()) {
             checkNoInternetWithNoNewsIsDisplayed(shouldComponentsBeVisible)
         } else {
@@ -138,8 +144,8 @@ class UITestManager(
         }
     }
 
-    private fun checkPageLoader(shouldComponentsBeVisible: Boolean) {
-        if (shouldComponentsBeVisible) {
+    private fun checkPageLoader(shouldPageLoaderBeVisible: Boolean) {
+        if (shouldPageLoaderBeVisible) {
             composeTestRule.onNodeWithContentDescription(pageLoaderContentDesc).assertExists()
         } else {
             composeTestRule.onNodeWithContentDescription(pageLoaderContentDesc).assertDoesNotExist()
@@ -150,16 +156,14 @@ class UITestManager(
         composeTestRule.apply {
             return if (newsListScreenViewModel.newsList.value.isNotEmpty()) {
                 onAllNodesWithContentDescription(clickableNewsArticleContentDesc)[0].performClick()
-                checkNewsListScreenComponents(
-                    shouldComponentsBeVisible = false,
-                    shouldToggleMenuBeVisible = false
-                )
+                checkNewsDetailsScreenComponents(shouldComponentsBeVisible = true, shouldToggleMenuBeVisible = false)
                 true
             } else {
                 false
             }
         }
     }
+
     private fun checkNewsListIsDisplayed(
         shouldComponentsBeVisible: Boolean
     ) {
@@ -186,16 +190,12 @@ class UITestManager(
             if (shouldComponentsBeVisible) {
                 onNodeWithText(newsCouldNotBeLoadedText).assertExists()
                 onNodeWithContentDescription(noNetworkIconContentDesc).assertExists()
-                onNodeWithText(retryButtonText).assertExists()
                 onNodeWithContentDescription(retryButtonContentDesc).assertExists()
-                onNodeWithText(useOfflineButtonText).assertExists()
                 onNodeWithContentDescription(useOfflineButtonContentDesc).assertExists()
             } else {
                 onNodeWithText(newsCouldNotBeLoadedText).assertDoesNotExist()
                 onNodeWithContentDescription(noNetworkIconContentDesc).assertDoesNotExist()
-                onNodeWithText(retryButtonText).assertDoesNotExist()
                 onNodeWithContentDescription(retryButtonContentDesc).assertDoesNotExist()
-                onNodeWithText(useOfflineButtonText).assertDoesNotExist()
                 onNodeWithContentDescription(useOfflineButtonContentDesc).assertDoesNotExist()
             }
         }
@@ -266,5 +266,36 @@ class UITestManager(
                 }
             }
         }
+    }
+
+    /**
+     * Functions used in test cases related to NewsDetailsScreen
+     */
+    fun checkNewsDetailsScreenComponents(
+        shouldComponentsBeVisible: Boolean,
+        shouldToggleMenuBeVisible: Boolean
+    ) {
+        checkTopAppBarComponents(shouldToggleMenuBeVisible)
+        composeTestRule.apply {
+            if (shouldComponentsBeVisible) {
+                onNodeWithContentDescription(newsEntityImageContainerContentDesc).assertExists()
+                onNodeWithContentDescription(newsEntityTitleContentDesc).assertExists()
+                onNodeWithContentDescription(newsEntityDescriptionContentDesc).assertExists()
+                onNodeWithContentDescription(newsEntityAuthorContentDesc).assertExists()
+                onNodeWithContentDescription(newsEntityPublishDateContentDesc).assertExists()
+                onNodeWithContentDescription(newsEntityReadFullArticleOnlineButtonContentDesc).assertExists()
+            } else {
+                onNodeWithContentDescription(newsEntityImageContainerContentDesc).assertDoesNotExist()
+                onNodeWithContentDescription(newsEntityTitleContentDesc).assertDoesNotExist()
+                onNodeWithContentDescription(newsEntityDescriptionContentDesc).assertDoesNotExist()
+                onNodeWithContentDescription(newsEntityAuthorContentDesc).assertDoesNotExist()
+                onNodeWithContentDescription(newsEntityPublishDateContentDesc).assertDoesNotExist()
+                onNodeWithContentDescription(newsEntityReadFullArticleOnlineButtonContentDesc).assertDoesNotExist()
+            }
+        }
+    }
+
+    fun navigateToArticleWebsite() {
+        composeTestRule.onNodeWithContentDescription(newsEntityReadFullArticleOnlineButtonContentDesc).performClick()
     }
 }

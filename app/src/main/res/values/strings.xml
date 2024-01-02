@@ -71,4 +71,7 @@
     <string name="content_desc_news_article_title">news article title</string>
     <string name="content_desc_news_article_publish_date">news article publish date</string>
     <string name="content_desc_clickable_news_article">clickable news article</string>
+    <string name="content_desc_news_article_description">news article description</string>
+    <string name="content_desc_news_article_author">news article author</string>
+    <string name="content_desc_read_full_article_online_button">read full article online button</string>
 </resources>

@@ -52,7 +52,7 @@ class NewsListScreenTest {
         uiTestManager.apply {
             checkNewsListScreenComponents(shouldComponentsBeVisible = true)
             navigateToInfoScreen()
-            checkNewsListScreenComponents(shouldComponentsBeVisible = false)
+            checkNewsListScreenComponents(shouldComponentsBeVisible = false, shouldPageLoaderBeVisible = false)
             checkInfoScreenComponents(shouldComponentsBeVisible = true)
         }
     }
